@@ -1,6 +1,6 @@
 // +build windows nacl plan9
 
-package irtt
+package nlmt
 
 const syslogSupport = false
 

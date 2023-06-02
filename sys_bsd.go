@@ -1,6 +1,6 @@
 // +build openbsd freebsd
 
-package irtt
+package nlmt
 
 import (
 	"net"

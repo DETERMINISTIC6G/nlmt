@@ -1,4 +1,4 @@
-package irtt
+package nlmt
 
 // Common error codes.
 const (

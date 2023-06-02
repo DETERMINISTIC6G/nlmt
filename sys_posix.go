@@ -1,6 +1,6 @@
 // +build darwin dragonfly freebsd linux netbsd openbsd solaris
 
-package irtt
+package nlmt
 
 import (
 	"net"

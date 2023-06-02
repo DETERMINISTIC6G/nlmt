@@ -1,4 +1,4 @@
-package irtt
+package nlmt
 
 // Version is the IRTT version number (replaced during build).
 var Version = "0.9.1"

@@ -1,6 +1,6 @@
 // +build linux
 
-package irtt
+package nlmt
 
 import (
 	"net"

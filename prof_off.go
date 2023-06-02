@@ -1,6 +1,6 @@
 // +build !profile
 
-package irtt
+package nlmt
 
 const profileEnabled = false
 

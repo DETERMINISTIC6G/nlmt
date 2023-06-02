@@ -1,6 +1,6 @@
 // +build !prod
 
-package irtt
+package nlmt
 
 import "time"
 

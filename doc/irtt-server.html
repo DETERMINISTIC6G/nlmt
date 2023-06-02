@@ -1,154 +1,13 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="" />
-  <meta name="dcterms.date" content="2018-02-11" />
+  <meta name="date" content="2018-02-11" />
   <title>IRTT-SERVER(1) v0.9.0 | IRTT Manual</title>
-  <style>
-    html {
-      line-height: 1.5;
-      font-family: Georgia, serif;
-      font-size: 20px;
-      color: #1a1a1a;
-      background-color: #fdfdfd;
-    }
-    body {
-      margin: 0 auto;
-      max-width: 36em;
-      padding-left: 50px;
-      padding-right: 50px;
-      padding-top: 50px;
-      padding-bottom: 50px;
-      hyphens: auto;
-      word-wrap: break-word;
-      text-rendering: optimizeLegibility;
-      font-kerning: normal;
-    }
-    @media (max-width: 600px) {
-      body {
-        font-size: 0.9em;
-        padding: 1em;
-      }
-    }
-    @media print {
-      body {
-        background-color: transparent;
-        color: black;
-        font-size: 12pt;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
-    p {
-      margin: 1em 0;
-    }
-    a {
-      color: #1a1a1a;
-    }
-    a:visited {
-      color: #1a1a1a;
-    }
-    img {
-      max-width: 100%;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 1.4em;
-    }
-    h5, h6 {
-      font-size: 1em;
-      font-style: italic;
-    }
-    h6 {
-      font-weight: normal;
-    }
-    ol, ul {
-      padding-left: 1.7em;
-      margin-top: 1em;
-    }
-    li > ol, li > ul {
-      margin-top: 0;
-    }
-    blockquote {
-      margin: 1em 0 1em 1.7em;
-      padding-left: 1em;
-      border-left: 2px solid #e6e6e6;
-      color: #606060;
-    }
-    code {
-      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
-      font-size: 85%;
-      margin: 0;
-    }
-    pre {
-      margin: 1em 0;
-      overflow: auto;
-    }
-    pre code {
-      padding: 0;
-      overflow: visible;
-    }
-    .sourceCode {
-     background-color: transparent;
-     overflow: visible;
-    }
-    hr {
-      background-color: #1a1a1a;
-      border: none;
-      height: 1px;
-      margin: 1em 0;
-    }
-    table {
-      margin: 1em 0;
-      border-collapse: collapse;
-      width: 100%;
-      overflow-x: auto;
-      display: block;
-      font-variant-numeric: lining-nums tabular-nums;
-    }
-    table caption {
-      margin-bottom: 0.75em;
-    }
-    tbody {
-      margin-top: 0.5em;
-      border-top: 1px solid #1a1a1a;
-      border-bottom: 1px solid #1a1a1a;
-    }
-    th {
-      border-top: 1px solid #1a1a1a;
-      padding: 0.25em 0.5em 0.25em 0.5em;
-    }
-    td {
-      padding: 0.125em 0.5em 0.25em 0.5em;
-    }
-    header {
-      margin-bottom: 4em;
-      text-align: center;
-    }
-    #TOC li {
-      list-style: none;
-    }
-    #TOC a:not(:hover) {
-      text-decoration: none;
-    }
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-  </style>
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
+  <style type="text/css">code{white-space: pre;}</style>
   <meta name=viewport content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css"
   	integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w"
@@ -186,11 +45,11 @@
   </style>
 </head>
 <body>
-<header id="title-block-header">
+<div id="header">
 <h1 class="title">IRTT-SERVER(1) v0.9.0 | IRTT Manual</h1>
-<p class="author"></p>
-<p class="date">February 11, 2018</p>
-</header>
+<h2 class="author"></h2>
+<h3 class="date">February 11, 2018</h3>
+</div>
 <h1 id="name">NAME</h1>
 <p>irtt-server - Isochronous Round-Trip Time Server</p>
 <h1 id="synopsis">SYNOPSIS</h1>
@@ -200,7 +59,7 @@
 <h1 id="options">OPTIONS</h1>
 <dl>
 <dt>-b <em>addresses</em></dt>
-<dd><p>Bind addresses (default “:2112”), comma separated list of:</p>
+<dd><p>Bind addresses (default &quot;:2112&quot;), comma separated list of:</p>
 <table class="pure-table pure-table-striped">
 <thead>
 <tr class="header">
@@ -250,7 +109,7 @@
 </ul>
 </dd>
 <dt>--syslog=<em>uri</em></dt>
-<dd><p>Log events to syslog (default don’t use syslog). URI format: protocol://host:port/tag. Examples:</p>
+<dd><p>Log events to syslog (default don't use syslog). URI format: protocol://host:port/tag. Examples:</p>
 <table class="pure-table pure-table-striped">
 <thead>
 <tr class="header">
@@ -301,7 +160,7 @@
 </tr>
 <tr class="even">
 <td><em>rand</em></td>
-<td>Use random bytes from Go’s math.rand</td>
+<td>Use random bytes from Go's math.rand</td>
 </tr>
 <tr class="odd">
 <td><em>pattern:</em>XX</td>
@@ -311,11 +170,11 @@
 </table>
 </dd>
 <dt>--allow-fills=<em>fills</em></dt>
-<dd><p>Comma separated patterns of fill requests to allow (default rand). See options for <em>–fill</em>. Notes:</p>
+<dd><p>Comma separated patterns of fill requests to allow (default rand). See options for <em>--fill</em>. Notes:</p>
 <ul>
 <li>Patterns may contain * for matching</li>
 <li>Allowing non-random fills insecure on public servers</li>
-<li>Use <em>--allow-fills=""</em> to disallow all fill requests</li>
+<li>Use <em>--allow-fills=&quot;&quot;</em> to disallow all fill requests</li>
 </ul>
 </dd>
 <dt>--tstamp=<em>modes</em></dt>
@@ -330,7 +189,7 @@
 <tbody>
 <tr class="odd">
 <td><em>none</em></td>
-<td>Don’t allow any timestamps</td>
+<td>Don't allow any timestamps</td>
 </tr>
 <tr class="even">
 <td><em>single</em></td>
@@ -344,10 +203,13 @@
 </table>
 </dd>
 <dt>--no-dscp</dt>
-<dd>Don’t allow setting dscp (default false)
+<dd>Don't allow setting dscp (default false)
 </dd>
 <dt>--set-src-ip</dt>
 <dd>Set source IP address on all outgoing packets from listeners on unspecified IP addresses (use for more reliable reply routing, but increases per-packet heap allocations)
+</dd>
+<dt>--ecn</dt>
+<dd>Ship ECN bits to be logged by the client. Forces --set-src-ip, disables UDP replies from server
 </dd>
 <dt>--thread</dt>
 <dd>Lock request handling goroutines to OS threads
@@ -385,7 +247,7 @@
 </table>
 <p><strong>Note:</strong> IPv6 addresses must be quoted in most shells.</p>
 <h2 id="duration-units">Duration units</h2>
-<p>Durations are a sequence of decimal numbers, each with optional fraction, and unit suffix, such as: “300ms”, “1m30s” or “2.5m”. Sanity not enforced.</p>
+<p>Durations are a sequence of decimal numbers, each with optional fraction, and unit suffix, such as: &quot;300ms&quot;, &quot;1m30s&quot; or &quot;2.5m&quot;. Sanity not enforced.</p>
 <table class="pure-table pure-table-striped">
 <thead>
 <tr class="header">
@@ -417,7 +279,7 @@
 </tbody>
 </table>
 <h1 id="security">SECURITY</h1>
-<p>Running an IRTT server that’s open to the outside world requires some additional attention. For starters, the command line flags should be used to, at a minimum:</p>
+<p>Running an IRTT server that's open to the outside world requires some additional attention. For starters, the command line flags should be used to, at a minimum:</p>
 <ul>
 <li>Restrict the duration (<em>-d</em>), interval (<em>-i</em>) and length (<em>-l</em>) of tests, particularly for public servers</li>
 <li>Set an HMAC key (<em>--hmac</em>) for private servers to prevent unauthorized discovery and use</li>
@@ -429,7 +291,7 @@
 <li>Setting up an iptables firewall (only UDP port 2112 must be open)</li>
 <li>Setting up a chroot jail</li>
 </ul>
-<p>It should be noted that there are no known security vulnerabilities in the Go language at this time, and the steps above, in particular the chroot jail, may or may not serve to enhance security in any way. Go-based servers are generally regarded as safe because of Go’s high-level language constructs for memory management, and at this time IRTT makes no use of Go’s <a href="https://golang.org/pkg/unsafe/">unsafe</a> package.</p>
+<p>It should be noted that there are no known security vulnerabilities in the Go language at this time, and the steps above, in particular the chroot jail, may or may not serve to enhance security in any way. Go-based servers are generally regarded as safe because of Go's high-level language constructs for memory management, and at this time IRTT makes no use of Go's <a href="https://golang.org/pkg/unsafe/">unsafe</a> package.</p>
 <h1 id="exit-status">EXIT STATUS</h1>
 <p><em>irtt server</em> exits with one of the following status codes:</p>
 <table class="pure-table pure-table-striped">
@@ -463,7 +325,7 @@
 <dt>$ irtt server</dt>
 <dd>Starts the server and listens on all addresses (unspecified address)
 </dd>
-<dt>$ irtt server -d 30s -i 20ms -l 256 --fill=rand --allow-fills=""</dt>
+<dt>$ irtt server -d 30s -i 20ms -l 256 --fill=rand --allow-fills=&quot;&quot;</dt>
 <dd>Starts the server and listens on all addresses, setting the maximum test duration to 30 seconds, minimum interval to 20 ms, and maximum packet length to 256 bytes. Disallows fill requests and forces all return packets to be filled with random data.
 </dd>
 <dt>$ irtt server -b 192.168.100.11:64381 --hmac=secret</dt>

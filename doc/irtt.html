@@ -1,154 +1,13 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="" />
-  <meta name="dcterms.date" content="2018-02-11" />
+  <meta name="date" content="2018-02-11" />
   <title>IRTT(1) v0.9.0 | IRTT Manual</title>
-  <style>
-    html {
-      line-height: 1.5;
-      font-family: Georgia, serif;
-      font-size: 20px;
-      color: #1a1a1a;
-      background-color: #fdfdfd;
-    }
-    body {
-      margin: 0 auto;
-      max-width: 36em;
-      padding-left: 50px;
-      padding-right: 50px;
-      padding-top: 50px;
-      padding-bottom: 50px;
-      hyphens: auto;
-      word-wrap: break-word;
-      text-rendering: optimizeLegibility;
-      font-kerning: normal;
-    }
-    @media (max-width: 600px) {
-      body {
-        font-size: 0.9em;
-        padding: 1em;
-      }
-    }
-    @media print {
-      body {
-        background-color: transparent;
-        color: black;
-        font-size: 12pt;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
-    p {
-      margin: 1em 0;
-    }
-    a {
-      color: #1a1a1a;
-    }
-    a:visited {
-      color: #1a1a1a;
-    }
-    img {
-      max-width: 100%;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 1.4em;
-    }
-    h5, h6 {
-      font-size: 1em;
-      font-style: italic;
-    }
-    h6 {
-      font-weight: normal;
-    }
-    ol, ul {
-      padding-left: 1.7em;
-      margin-top: 1em;
-    }
-    li > ol, li > ul {
-      margin-top: 0;
-    }
-    blockquote {
-      margin: 1em 0 1em 1.7em;
-      padding-left: 1em;
-      border-left: 2px solid #e6e6e6;
-      color: #606060;
-    }
-    code {
-      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
-      font-size: 85%;
-      margin: 0;
-    }
-    pre {
-      margin: 1em 0;
-      overflow: auto;
-    }
-    pre code {
-      padding: 0;
-      overflow: visible;
-    }
-    .sourceCode {
-     background-color: transparent;
-     overflow: visible;
-    }
-    hr {
-      background-color: #1a1a1a;
-      border: none;
-      height: 1px;
-      margin: 1em 0;
-    }
-    table {
-      margin: 1em 0;
-      border-collapse: collapse;
-      width: 100%;
-      overflow-x: auto;
-      display: block;
-      font-variant-numeric: lining-nums tabular-nums;
-    }
-    table caption {
-      margin-bottom: 0.75em;
-    }
-    tbody {
-      margin-top: 0.5em;
-      border-top: 1px solid #1a1a1a;
-      border-bottom: 1px solid #1a1a1a;
-    }
-    th {
-      border-top: 1px solid #1a1a1a;
-      padding: 0.25em 0.5em 0.25em 0.5em;
-    }
-    td {
-      padding: 0.125em 0.5em 0.25em 0.5em;
-    }
-    header {
-      margin-bottom: 4em;
-      text-align: center;
-    }
-    #TOC li {
-      list-style: none;
-    }
-    #TOC a:not(:hover) {
-      text-decoration: none;
-    }
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-  </style>
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
+  <style type="text/css">code{white-space: pre;}</style>
   <meta name=viewport content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css"
   	integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w"
@@ -186,11 +45,11 @@
   </style>
 </head>
 <body>
-<header id="title-block-header">
+<div id="header">
 <h1 class="title">IRTT(1) v0.9.0 | IRTT Manual</h1>
-<p class="author"></p>
-<p class="date">February 11, 2018</p>
-</header>
+<h2 class="author"></h2>
+<h3 class="date">February 11, 2018</h3>
+</div>
 <h1 id="name">NAME</h1>
 <p>irtt - Isochronous Round-Trip Time</p>
 <h1 id="synopsis">SYNOPSIS</h1>
@@ -225,7 +84,7 @@
 IRTT server starting...
 [ListenerStart] starting IPv6 listener on [::]:2112
 [ListenerStart] starting IPv4 listener on 0.0.0.0:2112</code></pre>
-<p>While that’s running, run a client. If no options are supplied, it will send a request once per second, like ping. Here we simulate a one minute G.711 VoIP conversation by using an interval of 20ms and randomly filled payloads of 172 bytes:</p>
+<p>While that's running, run a client. If no options are supplied, it will send a request once per second, like ping. Here we simulate a one minute G.711 VoIP conversation by using an interval of 20ms and randomly filled payloads of 172 bytes:</p>
 <pre><code>$ irtt client -i 20ms -l 172 -d 1m --fill=rand --sfill=rand -q 192.168.100.10
 [Connecting] connecting to 192.168.100.10
 [Connected] connected to 192.168.100.10:2112
@@ -259,19 +118,19 @@ IRTT server starting...
 </ul>
 <h1 id="limitations">LIMITATIONS</h1>
 <blockquote>
-<p>“It is the limitations of software that give it life.”</p>
+<p>&quot;It is the limitations of software that give it life.&quot;</p>
 <pre><code>-Me, justifying my limitations</code></pre>
 </blockquote>
 <h2 id="isochronous-fixed-period-send-schedule">Isochronous (fixed period) send schedule</h2>
 <p>Currently, IRTT only sends packets on a fixed period, foregoing the ability to simulate arbitrary traffic. Accepting this limitation offers some benefits:</p>
 <ul>
-<li>It’s easy to implement</li>
-<li>It’s easy to calculate how many packets and how much data will be sent in a given time</li>
+<li>It's easy to implement</li>
+<li>It's easy to calculate how many packets and how much data will be sent in a given time</li>
 <li>It simplifies timer error compensation</li>
 </ul>
 <p>Also, isochronous packets are commonly seen in VoIP, games and some streaming media, so it already simulates an array of common types of traffic.</p>
 <h2 id="fixed-packet-lengths-for-a-given-test">Fixed packet lengths for a given test</h2>
-<p>Packet lengths are fixed for the duration of the test. While this may not be an accurate simulation of some types of traffic, it means that IPDV measurements are accurate, where they wouldn’t be in any other case.</p>
+<p>Packet lengths are fixed for the duration of the test. While this may not be an accurate simulation of some types of traffic, it means that IPDV measurements are accurate, where they wouldn't be in any other case.</p>
 <h2 id="stateful-protocol">Stateful protocol</h2>
 <p>There are numerous benefits to stateless protocols, particularly for developers and data centers, including simplified server design, horizontal scalabity, and easily implemented zero-downtime restarts. However, in this case, a stateful protocol provides important benefits to the user, including:</p>
 <ul>
@@ -282,17 +141,17 @@ IRTT server starting...
 <h2 id="in-memory-results-storage">In-memory results storage</h2>
 <p>Results for each round-trip are stored in memory as the test is being run. Each result takes 72 bytes in memory (8 64-bit timestamps and a 64-bit server received packet window), so this limits the effective duration of the test, especially at very small send intervals. However, the advantages are:</p>
 <ul>
-<li>It’s easier to perform statistical analysis (like calculation of the median) on fixed arrays than on running data values</li>
-<li>We don’t need to either send client timestamps to the server, or maintain a local running window of sent packet info, because they’re all in memory, no matter when server replies come back</li>
+<li>It's easier to perform statistical analysis (like calculation of the median) on fixed arrays than on running data values</li>
+<li>We don't need to either send client timestamps to the server, or maintain a local running window of sent packet info, because they're all in memory, no matter when server replies come back</li>
 <li>Not accessing the disk during the test to write test output prevents inadvertently affecting the results</li>
 <li>It simplifies the API</li>
 </ul>
 <p>As a consequence of storing results in memory, packet sequence numbers are fixed at 32-bits. If all 2^32 sequence numbers were used, the results would require over 300 Gb of virtual memory to record while the test is running. That is why 64-bit sequence numbers are currently unnecessary.</p>
 <h2 id="bit-received-window">64-bit received window</h2>
-<p>In order to determine per-packet differentiation between upstream and downstream loss, a 64-bit “received window” may be returned with each packet that contains the receipt status of the previous 64 packets. This can be enabled using <code>--stats=window/both</code> with the irtt client. Its limited width and simple bitmap format lead to some caveats:</p>
+<p>In order to determine per-packet differentiation between upstream and downstream loss, a 64-bit &quot;received window&quot; may be returned with each packet that contains the receipt status of the previous 64 packets. This can be enabled using <code>--stats=window/both</code> with the irtt client. Its limited width and simple bitmap format lead to some caveats:</p>
 <ul>
 <li>Per-packet differentiation is not available (for any intervening packets) if greater than 64 packets are lost in succession. These packets will be marked with the generic <code>Lost</code>.</li>
-<li>While any packet marked <code>LostDown</code> is guaranteed to be marked properly, there is no confirmation of receipt of the receive window from the client to the server, so packets may sometimes be erroneously marked <code>LostUp</code>, for example, if they arrive late to the server and slide out of the received window before they can be confirmed to the client, or if the received window is lost on its way to the client and not amended by a later packet’s received window.</li>
+<li>While any packet marked <code>LostDown</code> is guaranteed to be marked properly, there is no confirmation of receipt of the receive window from the client to the server, so packets may sometimes be erroneously marked <code>LostUp</code>, for example, if they arrive late to the server and slide out of the received window before they can be confirmed to the client, or if the received window is lost on its way to the client and not amended by a later packet's received window.</li>
 </ul>
 <p>There are many ways that this simple approach could be improved, such as by:</p>
 <ul>
@@ -300,7 +159,7 @@ IRTT server starting...
 <li>Encoding receipt seqnos in a more intelligent way to allow a wider seqno range</li>
 <li>Sending confirmation of window receipt from the client to the server and re-sending unreceived windows</li>
 </ul>
-<p>However, the current strategy means that a good approximation of per-packet loss results can be obtained with only 8 additional bytes in each packet. It also requires very little computational time on the server, and almost all computation on the client occurs during results generation, after the test is complete. It isn’t as accurate with late (out-of-order) upstream packets or with long sequences of lost packets, but high loss or high numbers of late packets typically indicate more severe network conditions that should be corrected first anyway, perhaps before per-packet results matter. Note that in case of very high packet loss, the <strong>total</strong> number of packets received by the server but not returned to the client (which can be obtained using <code>--stats=count</code>) will still be correct, which will still provide an accurate <strong>average</strong> loss percentage in each direction over the course of the test.</p>
+<p>However, the current strategy means that a good approximation of per-packet loss results can be obtained with only 8 additional bytes in each packet. It also requires very little computational time on the server, and almost all computation on the client occurs during results generation, after the test is complete. It isn't as accurate with late (out-of-order) upstream packets or with long sequences of lost packets, but high loss or high numbers of late packets typically indicate more severe network conditions that should be corrected first anyway, perhaps before per-packet results matter. Note that in case of very high packet loss, the <strong>total</strong> number of packets received by the server but not returned to the client (which can be obtained using <code>--stats=count</code>) will still be correct, which will still provide an accurate <strong>average</strong> loss percentage in each direction over the course of the test.</p>
 <h2 id="use-of-go">Use of Go</h2>
 <p>IRTT is written in Go. That carries with it:</p>
 <ul>
@@ -310,17 +169,17 @@ IRTT server starting...
 </ul>
 <p>However, Go also has characteristics that make it a good fit for this application:</p>
 <ul>
-<li>Go’s target is network and server applications, with a focus on simplicity, reliability and efficiency, which is appropriate for IRTT</li>
+<li>Go's target is network and server applications, with a focus on simplicity, reliability and efficiency, which is appropriate for IRTT</li>
 <li>Memory footprint tends to be significantly lower than with some interpreted languages</li>
-<li>It’s easy to support a broad array of hardware and OS combinations</li>
+<li>It's easy to support a broad array of hardware and OS combinations</li>
 </ul>
 <h1 id="see-also">SEE ALSO</h1>
 <p><a href="irtt-client.html">irtt-client(1)</a>, <a href="irtt-server.html">irtt-server(1)</a></p>
 <p><a href="https://github.com/heistp/irtt/">IRTT GitHub repository</a></p>
 <h1 id="author">AUTHOR</h1>
-<p>Pete Heist <a href="mailto:pete@heistp.net" class="email">pete@heistp.net</a></p>
+<p>Pete Heist <a href="mailto:pete@heistp.net">pete@heistp.net</a></p>
 <p>Many thanks to both Toke Høiland-Jørgensen and Dave Täht from the <a href="https://www.bufferbloat.net/">Bufferbloat project</a> for their valuable advice. Any problems in design or implementation are entirely my own.</p>
 <h1 id="history">HISTORY</h1>
-<p>IRTT was originally written to improve the latency and packet loss measurements for the excellent <a href="https://flent.org">Flent</a> tool. Flent was developed by and for the <a href="https://www.bufferbloat.net/projects/">Bufferbloat</a> project, which aims to reduce “chaotic and laggy network performance,” making this project valuable to anyone who values their time and sanity while using the Internet.</p>
+<p>IRTT was originally written to improve the latency and packet loss measurements for the excellent <a href="https://flent.org">Flent</a> tool. Flent was developed by and for the <a href="https://www.bufferbloat.net/projects/">Bufferbloat</a> project, which aims to reduce &quot;chaotic and laggy network performance,&quot; making this project valuable to anyone who values their time and sanity while using the Internet.</p>
 </body>
 </html>

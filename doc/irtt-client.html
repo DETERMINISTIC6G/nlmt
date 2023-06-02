@@ -1,154 +1,13 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="" />
-  <meta name="dcterms.date" content="2018-02-11" />
+  <meta name="date" content="2018-02-11" />
   <title>IRTT-CLIENT(1) v0.9.0 | IRTT Manual</title>
-  <style>
-    html {
-      line-height: 1.5;
-      font-family: Georgia, serif;
-      font-size: 20px;
-      color: #1a1a1a;
-      background-color: #fdfdfd;
-    }
-    body {
-      margin: 0 auto;
-      max-width: 36em;
-      padding-left: 50px;
-      padding-right: 50px;
-      padding-top: 50px;
-      padding-bottom: 50px;
-      hyphens: auto;
-      word-wrap: break-word;
-      text-rendering: optimizeLegibility;
-      font-kerning: normal;
-    }
-    @media (max-width: 600px) {
-      body {
-        font-size: 0.9em;
-        padding: 1em;
-      }
-    }
-    @media print {
-      body {
-        background-color: transparent;
-        color: black;
-        font-size: 12pt;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
-    p {
-      margin: 1em 0;
-    }
-    a {
-      color: #1a1a1a;
-    }
-    a:visited {
-      color: #1a1a1a;
-    }
-    img {
-      max-width: 100%;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 1.4em;
-    }
-    h5, h6 {
-      font-size: 1em;
-      font-style: italic;
-    }
-    h6 {
-      font-weight: normal;
-    }
-    ol, ul {
-      padding-left: 1.7em;
-      margin-top: 1em;
-    }
-    li > ol, li > ul {
-      margin-top: 0;
-    }
-    blockquote {
-      margin: 1em 0 1em 1.7em;
-      padding-left: 1em;
-      border-left: 2px solid #e6e6e6;
-      color: #606060;
-    }
-    code {
-      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
-      font-size: 85%;
-      margin: 0;
-    }
-    pre {
-      margin: 1em 0;
-      overflow: auto;
-    }
-    pre code {
-      padding: 0;
-      overflow: visible;
-    }
-    .sourceCode {
-     background-color: transparent;
-     overflow: visible;
-    }
-    hr {
-      background-color: #1a1a1a;
-      border: none;
-      height: 1px;
-      margin: 1em 0;
-    }
-    table {
-      margin: 1em 0;
-      border-collapse: collapse;
-      width: 100%;
-      overflow-x: auto;
-      display: block;
-      font-variant-numeric: lining-nums tabular-nums;
-    }
-    table caption {
-      margin-bottom: 0.75em;
-    }
-    tbody {
-      margin-top: 0.5em;
-      border-top: 1px solid #1a1a1a;
-      border-bottom: 1px solid #1a1a1a;
-    }
-    th {
-      border-top: 1px solid #1a1a1a;
-      padding: 0.25em 0.5em 0.25em 0.5em;
-    }
-    td {
-      padding: 0.125em 0.5em 0.25em 0.5em;
-    }
-    header {
-      margin-bottom: 4em;
-      text-align: center;
-    }
-    #TOC li {
-      list-style: none;
-    }
-    #TOC a:not(:hover) {
-      text-decoration: none;
-    }
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-  </style>
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
+  <style type="text/css">code{white-space: pre;}</style>
   <meta name=viewport content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css"
   	integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w"
@@ -186,11 +45,11 @@
   </style>
 </head>
 <body>
-<header id="title-block-header">
+<div id="header">
 <h1 class="title">IRTT-CLIENT(1) v0.9.0 | IRTT Manual</h1>
-<p class="author"></p>
-<p class="date">February 11, 2018</p>
-</header>
+<h2 class="author"></h2>
+<h3 class="date">February 11, 2018</h3>
+</div>
 <h1 id="name">NAME</h1>
 <p>irtt-client - Isochronous Round-Trip Time Client</p>
 <h1 id="synopsis">SYNOPSIS</h1>
@@ -213,7 +72,7 @@
 </ul>
 </dd>
 <dt>-o <em>file</em></dt>
-<dd><p>Write JSON output to file (use ‘-’ for stdout). The extension used for <em>file</em> controls the gzip behavior as follows (output to stdout is not gzipped):</p>
+<dd><p>Write JSON output to file (use '-' for stdout). The extension used for <em>file</em> controls the gzip behavior as follows (output to stdout is not gzipped):</p>
 <table class="pure-table pure-table-striped">
 <thead>
 <tr class="header">
@@ -248,7 +107,7 @@
 <dd>Really quiet, suppress all output except errors to stderr
 </dd>
 <dt>-n</dt>
-<dd>No test, connect to the server and validate test parameters but don’t run the test
+<dd>No test, connect to the server and validate test parameters but don't run the test
 </dd>
 <dt>--stats=<em>stats</em></dt>
 <dd><p>Server stats on received packets (default <em>both</em>). Possible values:</p>
@@ -448,7 +307,7 @@
 <tbody>
 <tr class="odd">
 <td><em>simple</em></td>
-<td>Go’s standard time.Timer</td>
+<td>Go's standard time.Timer</td>
 </tr>
 <tr class="even">
 <td><em>comp</em></td>
@@ -506,7 +365,7 @@
 </tr>
 <tr class="even">
 <td><em>rand</em></td>
-<td>Use random bytes from Go’s math.rand</td>
+<td>Use random bytes from Go's math.rand</td>
 </tr>
 <tr class="odd">
 <td><em>pattern:</em>XX</td>
@@ -519,7 +378,7 @@
 <dd>Fill only once and repeat for all packets
 </dd>
 <dt>--sfill=fill</dt>
-<dd>Request server fill (default not specified). See values for –fill. Server must support and allow this fill with –allow-fills.
+<dd>Request server fill (default not specified). See values for --fill. Server must support and allow this fill with --allow-fills.
 </dd>
 <dt>--local=addr</dt>
 <dd><p>Local address (default from OS). Possible values:</p>
@@ -604,7 +463,7 @@
 </table>
 <p><strong>Note:</strong> IPv6 addresses must be quoted in most shells.</p>
 <h2 id="duration-units">Duration units</h2>
-<p>Durations are a sequence of decimal numbers, each with optional fraction, and unit suffix, such as: “300ms”, “1m30s” or “2.5m”. Sanity not enforced.</p>
+<p>Durations are a sequence of decimal numbers, each with optional fraction, and unit suffix, such as: &quot;300ms&quot;, &quot;1m30s&quot; or &quot;2.5m&quot;. Sanity not enforced.</p>
 <table class="pure-table pure-table-striped">
 <thead>
 <tr class="header">
@@ -636,8 +495,8 @@
 </tbody>
 </table>
 <h1 id="output">OUTPUT</h1>
-<p>IRTT’s JSON output format consists of five top-level objects:</p>
-<ol type="1">
+<p>IRTT's JSON output format consists of five top-level objects:</p>
+<ol style="list-style-type: decimal">
 <li><a href="#version">version</a></li>
 <li><a href="#system_info">system_info</a></li>
 <li><a href="#config">config</a></li>
@@ -666,8 +525,8 @@
     &quot;hostname&quot;: &quot;tron.local&quot;
 },</code></pre>
 <ul>
-<li><em>os</em> the Operating System from Go’s <em>runtime.GOOS</em></li>
-<li><em>cpus</em> the number of CPUs reported by Go’s <em>runtime.NumCPU()</em>, which reflects the number of logical rather than physical CPUs. In the example below, the number 8 is reported for a Core i7 (quad core) with hyperthreading (2 threads per core).</li>
+<li><em>os</em> the Operating System from Go's <em>runtime.GOOS</em></li>
+<li><em>cpus</em> the number of CPUs reported by Go's <em>runtime.NumCPU()</em>, which reflects the number of logical rather than physical CPUs. In the example below, the number 8 is reported for a Core i7 (quad core) with hyperthreading (2 threads per core).</li>
 <li><em>go_version</em> the version of Go the executable was built with</li>
 <li><em>hostname</em> the local hostname</li>
 </ul>
@@ -727,8 +586,7 @@
 <li><em>local_address</em> the local address (IP:port) for the client</li>
 <li><em>remote_address</em> the remote address (IP:port) for the server</li>
 <li><em>open_timeouts</em> a list of timeout durations used after an open packet is sent</li>
-<li><em>params</em> are the parameters that were negotiated with the server, including:
-<ul>
+<li><em>params</em> are the parameters that were negotiated with the server, including:</li>
 <li><em>proto_version</em> protocol version number</li>
 <li><em>duration</em> duration of the test, in nanoseconds</li>
 <li><em>interval</em> send interval, in nanoseconds</li>
@@ -738,7 +596,6 @@
 <li><em>clock</em> clock selection parameter (wall or monotonic, <em>--clock</em> flag for irtt client)</li>
 <li><em>dscp</em> the <a href="https://en.wikipedia.org/wiki/Differentiated_services">DSCP</a> value</li>
 <li><em>server_fill</em> the requested server fill (<em>--sfill</em> flag for irtt client)</li>
-</ul></li>
 <li><em>loose</em> if true, client accepts and uses restricted server parameters, with a warning</li>
 <li><em>ip_version</em> the IP version used (IPv4 or IPv6)</li>
 <li><em>df</em> the do-not-fragment setting (0 == OS default, 1 == false, 2 == true)</li>
@@ -1009,13 +866,12 @@
         &quot;ipdv&quot;: {}
     }
 ]</code></pre>
-<p><strong>Note:</strong> <em>wall</em> values are from Go’s <em>time.Time.UnixNano()</em>, the number of nanoseconds elapsed since January 1, 1970 UTC</p>
+<p><strong>Note:</strong> <em>wall</em> values are from Go's <em>time.Time.UnixNano()</em>, the number of nanoseconds elapsed since January 1, 1970 UTC</p>
 <p><strong>Note:</strong> <em>monotonic</em> values are the number of nanoseconds since some arbitrary point in time, so can only be relied on to measure duration</p>
 <ul>
 <li><em>seqno</em> the sequence number</li>
 <li><em>lost</em> the lost status of the packet, which can be one of <em>false</em>, <em>true</em>, <em>true_down</em> or <em>true_up</em>. The <em>true_down</em> and <em>true_up</em> values are only possible if the <em>ReceivedStats</em> parameter includes <em>ReceivedStatsWindow</em> (irtt client <em>--stats</em> flag). Even then, if it could not be determined whether the packet was lost upstream or downstream, the value <em>true</em> is used.</li>
-<li><em>timestamps</em> the client and server timestamps
-<ul>
+<li><em>timestamps</em> the client and server timestamps</li>
 <li><em>client</em> the client send and receive wall and monotonic timestamps <strong>(<em>receive</em> values only present if <em>lost</em> is false)</strong></li>
 <li><em>server</em> the server send and receive wall and monotonic timestamps <strong>(both <em>send</em> and <em>receive</em> values not present if <em>lost</em> is true)</strong>, and additionally:
 <ul>
@@ -1024,13 +880,10 @@
 <li><em>wall</em> values are not present if the Clock (irtt client <em>--clock</em> flag) does not include wall values or server timestamps are not enabled</li>
 <li><em>monotonic</em> values are not present if the Clock (irtt client <em>--clock</em> flag) does not include monotonic values or server timestamps are not enabled</li>
 </ul></li>
-</ul></li>
-<li><em>delay</em> an object containing the delay values
-<ul>
+<li><em>delay</em> an object containing the delay values</li>
 <li><em>receive</em> the one-way receive delay, in nanoseconds <strong>(present only if server timestamps are enabled and at least one wall clock value is available)</strong></li>
 <li><em>rtt</em> the round-trip time, in nanoseconds, always present</li>
 <li><em>send</em> the one-way send delay, in nanoseconds <strong>(present only if server timestamps are enabled and at least one wall clock value is available)</strong></li>
-</ul></li>
 <li><em>ipdv</em> an object containing the <a href="https://en.wikipedia.org/wiki/Packet_delay_variation">IPDV</a> values <strong>(attributes present only for <em>seqno</em> &gt; 0, and if <em>lost</em> is <em>false</em> for both the current and previous <em>round_trip</em>)</strong>
 <ul>
 <li><em>receive</em> the difference in receive delay relative to the previous packet <strong>(present only if at least one server timestamp is available)</strong></li>
@@ -1087,7 +940,7 @@
 <dt>$ irtt client -i 0.1s -d 5s -6 --dscp=46 irtt.example.org</dt>
 <dd>Sends requests with IPv6 every 100ms for 5 seconds to irtt.example.org. Sets the DSCP value (ToS field) of requests and responses to 46 (Expedited Forwarding).
 </dd>
-<dt>$ irtt client --hmac=secret -d 10s “[2001:db8:8f::2/32]:64381”</dt>
+<dt>$ irtt client --hmac=secret -d 10s &quot;[2001:db8:8f::2/32]:64381&quot;</dt>
 <dd>Sends requests to the specified IPv6 IP on port 64381 every second for 10 seconds. Adds an HMAC to each packet with the key <em>secret</em>.
 </dd>
 </dl>

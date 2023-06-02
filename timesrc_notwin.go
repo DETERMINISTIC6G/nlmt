@@ -1,6 +1,6 @@
 // +build !windows
 
-package irtt
+package nlmt
 
 // NewDefaultTimeSource returns a WindowsTimeSource for Windows and GoTimeSource
 // for everything else.

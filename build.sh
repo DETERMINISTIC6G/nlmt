@@ -6,7 +6,7 @@
 # - pandoc (apt-get install pandoc OR brew install pandoc)
 
 action="build"
-pkg="github.com/heistp/irtt/cmd/irtt"
+pkg="github.com/samiemostafavi/nlmt/cmd/irtt"
 ldflags=""
 linkshared=""
 tags=""

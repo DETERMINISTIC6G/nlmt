@@ -1,6 +1,6 @@
 // +build profile
 
-package irtt
+package nlmt
 
 import (
 	"github.com/pkg/profile"

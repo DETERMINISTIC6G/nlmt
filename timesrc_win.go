@@ -1,6 +1,6 @@
 // +build windows
 
-package irtt
+package nlmt
 
 import (
 	"fmt"

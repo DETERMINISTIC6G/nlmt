@@ -8,6 +8,8 @@ const (
 	FieldsCapacityTooLarge
 	InvalidStampAtString
 	InvalidStampAtInt
+	InvalidTripModeString
+	InvalidTripModeInt
 	InvalidAllowStampString
 	InvalidClockString
 	InvalidClockInt

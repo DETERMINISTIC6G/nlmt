@@ -40,6 +40,7 @@ func NewClientConfig() *ClientConfig {
 			Interval:        DefaultInterval,
 			Length:          DefaultLength,
 			StampAt:         DefaultStampAt,
+			TripMode:        DefaultTripMode,
 			Clock:           DefaultClock,
 			DSCP:            DefaultDSCP,
 		},

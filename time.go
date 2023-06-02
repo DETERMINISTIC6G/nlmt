@@ -216,6 +216,48 @@ func ParseStampAt(s string) (StampAt, error) {
 	return AtNone, Errorf(InvalidStampAtString, "invalid StampAt string: %s", s)
 }
 
+// TripMode selects the packets route mode
+type TripMode int
+
+// TripMode constants.
+const (
+	TMRound   TripMode = 0x00
+	TMSend    TripMode = 0x01
+	TMReceive TripMode = 0x02
+)
+
+var tms = [...]string{"round", "send", "receive"}
+
+func (tm TripMode) String() string {
+	if int(tm) < 0 || int(tm) >= len(tms) {
+		return fmt.Sprintf("TripMode:%d", tm)
+	}
+	return tms[tm]
+}
+
+// TripModeFromInt returns a TripMode value from its int constant.
+func TripModeFromInt(v int) (TripMode, error) {
+	if v < int(TMRound) || v > int(TMReceive) {
+		return TMRound, Errorf(InvalidTripModeInt, "invalid TripMode int: %d", v)
+	}
+	return TripMode(v), nil
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (tm TripMode) MarshalJSON() ([]byte, error) {
+	return json.Marshal(tm.String())
+}
+
+// ParseTripMode returns a TripMode value from its string.
+func ParseTripMode(s string) (TripMode, error) {
+	for i, v := range tms {
+		if v == s {
+			return TripMode(i), nil
+		}
+	}
+	return TMRound, Errorf(InvalidTripModeString, "invalid TripMode string: %s", s)
+}
+
 // Clock selects the clock/s to use for timestamps.
 type Clock int
 

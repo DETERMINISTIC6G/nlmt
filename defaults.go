@@ -20,6 +20,7 @@ const (
 	DefaultLength                  = 0
 	DefaultReceivedStats           = ReceivedStatsBoth
 	DefaultStampAt                 = AtBoth
+	DefaultTripMode                = TMRound
 	DefaultClock                   = BothClocks
 	DefaultDSCP                    = 0
 	DefaultLoose                   = false

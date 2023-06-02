@@ -51,6 +51,10 @@ func clientUsage() {
 	printf("               receive: request timestamp at server receive")
 	printf("               both: request both send and receive timestamps")
 	printf("               midpoint: request midpoint timestamp (send/receive avg)")
+	printf("--tripm=mode   packets trip mode (default %s)", DefaultTripMode.String())
+	printf("               round: round-trip")
+	printf("               send: only uplink")
+	printf("               receive: only downlink")
 	printf("--clock=clock  clock/s used for server timestamps (default %s)", DefaultClock)
 	printf("               wall: wall clock only")
 	printf("               monotonic: monotonic clock only")
@@ -158,6 +162,7 @@ func runClientCLI(args []string) {
 	var noTest = fs.BoolP("n", "n", false, "no test")
 	var rsStr = fs.String("stats", DefaultReceivedStats.String(), "received stats")
 	var tsatStr = fs.String("tstamp", DefaultStampAt.String(), "stamp at")
+	var tmStr = fs.String("tripm", DefaultTripMode.String(), "trip mode")
 	var clockStr = fs.String("clock", DefaultClock.String(), "clock")
 	var outputStr = fs.StringP("o", "o", "", "output file")
 	var quiet = fs.BoolP("q", "q", defaultQuiet, "quiet")
@@ -228,6 +233,10 @@ func runClientCLI(args []string) {
 
 	// parse timestamp string
 	at, err := ParseStampAt(*tsatStr)
+	exitOnError(err, exitCodeBadCommandLine)
+
+	// parse trip mode string
+	tm, err := ParseTripMode(*tmStr)
 	exitOnError(err, exitCodeBadCommandLine)
 
 	// parse clock
@@ -302,6 +311,7 @@ func runClientCLI(args []string) {
 	cfg.Length = *length
 	cfg.ReceivedStats = rs
 	cfg.StampAt = at
+	cfg.TripMode = tm
 	cfg.Clock = clock
 	cfg.DSCP = int(dscp)
 	cfg.ServerFill = *sfillStr

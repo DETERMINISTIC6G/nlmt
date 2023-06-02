@@ -29,6 +29,7 @@ type Params struct {
 	Length          int           `json:"length"`
 	ReceivedStats   ReceivedStats `json:"received_stats"`
 	StampAt         StampAt       `json:"stamp_at"`
+	TripMode        TripMode      `json:"trip_mode"`
 	Clock           Clock         `json:"clock"`
 	DSCP            int           `json:"dscp"`
 	ServerFill      string        `json:"server_fill"`

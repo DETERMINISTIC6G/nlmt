@@ -14,21 +14,23 @@ func _() {
 	_ = x[FieldsCapacityTooLarge - -4]
 	_ = x[InvalidStampAtString - -5]
 	_ = x[InvalidStampAtInt - -6]
-	_ = x[InvalidAllowStampString - -7]
-	_ = x[InvalidClockString - -8]
-	_ = x[InvalidClockInt - -9]
-	_ = x[BadMagic - -10]
-	_ = x[NoHMAC - -11]
-	_ = x[BadHMAC - -12]
-	_ = x[UnexpectedHMAC - -13]
-	_ = x[NonexclusiveMidpointTStamp - -14]
-	_ = x[InconsistentClocks - -15]
-	_ = x[DFNotSupported - -16]
-	_ = x[InvalidFlagBitsSet - -17]
-	_ = x[ShortParamBuffer - -18]
-	_ = x[ParamOverflow - -19]
-	_ = x[InvalidParamValue - -20]
-	_ = x[ProtocolVersionMismatch - -21]
+	_ = x[InvalidTripModeString - -7]
+	_ = x[InvalidTripModeInt - -8]
+	_ = x[InvalidAllowStampString - -9]
+	_ = x[InvalidClockString - -10]
+	_ = x[InvalidClockInt - -11]
+	_ = x[BadMagic - -12]
+	_ = x[NoHMAC - -13]
+	_ = x[BadHMAC - -14]
+	_ = x[UnexpectedHMAC - -15]
+	_ = x[NonexclusiveMidpointTStamp - -16]
+	_ = x[InconsistentClocks - -17]
+	_ = x[DFNotSupported - -18]
+	_ = x[InvalidFlagBitsSet - -19]
+	_ = x[ShortParamBuffer - -20]
+	_ = x[ParamOverflow - -21]
+	_ = x[InvalidParamValue - -22]
+	_ = x[ProtocolVersionMismatch - -23]
 	_ = x[NoMatchingInterfaces - -1024]
 	_ = x[NoMatchingInterfacesUp - -1025]
 	_ = x[UnspecifiedWithSpecifiedAddresses - -1026]
@@ -97,7 +99,7 @@ func _() {
 const (
 	_Code_name_0 = "UnexpectedInitChannelCloseServerFillTooLongOpenTimeoutTooShortInvalidReceivedStatsStringInvalidReceivedStatsIntInvalidServerRestrictionOpenTimeoutServerClosedConnTokenZeroDurationNonPositiveIntervalNonPositiveNoSuchWaiterNoSuchTimeSourceNoSuchTimerNoSuchFillerNoSuchAveragerInvalidWaitDurationInvalidWaitFactorInvalidWaitStringInvalidSleepFactorUnexpectedSequenceNumberClockMismatchStampAtMismatchShortReplyExpectedReplyFlagTTLErrorDFErrorUnexpectedOpenFlagAllocateResultsPanicInvalidExpAvgAlphaInvalidWinAvgWindow"
 	_Code_name_1 = "InvalidSyslogURISyslogNotSupportedAddressMismatchLargeRequestShortIntervalInvalidConnTokenNoSuitableAddressFoundUnexpectedReplyFlagUnspecifiedWithSpecifiedAddressesNoMatchingInterfacesUpNoMatchingInterfaces"
-	_Code_name_2 = "ProtocolVersionMismatchInvalidParamValueParamOverflowShortParamBufferInvalidFlagBitsSetDFNotSupportedInconsistentClocksNonexclusiveMidpointTStampUnexpectedHMACBadHMACNoHMACBadMagicInvalidClockIntInvalidClockStringInvalidAllowStampStringInvalidStampAtIntInvalidStampAtStringFieldsCapacityTooLargeFieldsLengthTooLargeInvalidDFStringShortWrite"
+	_Code_name_2 = "ProtocolVersionMismatchInvalidParamValueParamOverflowShortParamBufferInvalidFlagBitsSetDFNotSupportedInconsistentClocksNonexclusiveMidpointTStampUnexpectedHMACBadHMACNoHMACBadMagicInvalidClockIntInvalidClockStringInvalidAllowStampStringInvalidTripModeIntInvalidTripModeStringInvalidStampAtIntInvalidStampAtStringFieldsCapacityTooLargeFieldsLengthTooLargeInvalidDFStringShortWrite"
 	_Code_name_3 = "MultipleAddressesServerStartServerStopListenerStartListenerStopListenerErrorDropNewConnOpenCloseCloseConnNoDSCPSupportExceededDurationNoReceiveDstAddrSupportRemoveNoConnInvalidServerFill"
 	_Code_name_4 = "ConnectingConnectedWaitForPacketsServerRestrictionNoTestConnectedClosed"
 )
@@ -105,7 +107,7 @@ const (
 var (
 	_Code_index_0 = [...]uint16{0, 26, 43, 62, 88, 111, 135, 146, 158, 171, 190, 209, 221, 237, 248, 260, 274, 293, 310, 327, 345, 369, 382, 397, 407, 424, 432, 439, 457, 477, 495, 514}
 	_Code_index_1 = [...]uint8{0, 16, 34, 49, 61, 74, 90, 112, 131, 164, 186, 206}
-	_Code_index_2 = [...]uint16{0, 23, 40, 53, 69, 87, 101, 119, 145, 159, 166, 172, 180, 195, 213, 236, 253, 273, 295, 315, 330, 340}
+	_Code_index_2 = [...]uint16{0, 23, 40, 53, 69, 87, 101, 119, 145, 159, 166, 172, 180, 195, 213, 236, 254, 275, 292, 312, 334, 354, 369, 379}
 	_Code_index_3 = [...]uint8{0, 17, 28, 38, 51, 63, 76, 80, 87, 96, 105, 118, 134, 157, 169, 186}
 	_Code_index_4 = [...]uint8{0, 10, 19, 33, 50, 56, 71}
 )
@@ -118,8 +120,8 @@ func (i Code) String() string {
 	case -1034 <= i && i <= -1024:
 		i -= -1034
 		return _Code_name_1[_Code_index_1[i]:_Code_index_1[i+1]]
-	case -21 <= i && i <= -1:
-		i -= -21
+	case -23 <= i && i <= -1:
+		i -= -23
 		return _Code_name_2[_Code_index_2[i]:_Code_index_2[i+1]]
 	case 1024 <= i && i <= 1038:
 		i -= 1024

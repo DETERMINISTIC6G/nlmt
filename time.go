@@ -221,12 +221,11 @@ type TripMode int
 
 // TripMode constants.
 const (
-	TMRound   TripMode = 0x00
-	TMSend    TripMode = 0x01
-	TMReceive TripMode = 0x02
+	TMRound  TripMode = 0x00
+	TMOneWay TripMode = 0x01
 )
 
-var tms = [...]string{"round", "send", "receive"}
+var tms = [...]string{"round", "oneway"}
 
 func (tm TripMode) String() string {
 	if int(tm) < 0 || int(tm) >= len(tms) {
@@ -237,7 +236,7 @@ func (tm TripMode) String() string {
 
 // TripModeFromInt returns a TripMode value from its int constant.
 func TripModeFromInt(v int) (TripMode, error) {
-	if v < int(TMRound) || v > int(TMReceive) {
+	if v < int(TMRound) || v > int(TMOneWay) {
 		return TMRound, Errorf(InvalidTripModeInt, "invalid TripMode int: %d", v)
 	}
 	return TripMode(v), nil

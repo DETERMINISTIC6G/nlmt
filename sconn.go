@@ -1,6 +1,7 @@
 package nlmt
 
 import (
+	"fmt"
 	"math/rand"
 	"net"
 	"time"
@@ -20,8 +21,10 @@ type sconn struct {
 	lastSeqno      Seqno
 	receivedCount  ReceivedCount
 	receivedWindow ReceivedWindow
+	rHandler       sconnHandler
 	rwinValid      bool
 	bytes          uint64
+	rec            *Recorder
 }
 
 func newSconn(l *listener, raddr *net.UDPAddr) *sconn {
@@ -42,6 +45,7 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 	// parse, restrict and set params
 	var params *Params
 	params, err = parseParams(p.payload())
+	fmt.Printf("%+v\n", params)
 	if err != nil {
 		return
 	}
@@ -71,7 +75,13 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 		l.eventf(OpenClose, p.raddr, "open-close connection")
 	} else {
 		l.cmgr.put(sc)
-		l.eventf(NewConn, p.raddr, "new connection, token=%016x", sc.ctoken)
+		l.eventf(NewConn, p.raddr, "new connection, token=%016x, trip-mode=%s", sc.ctoken, sc.params.TripMode)
+	}
+
+	// create recorder
+	if sc.rec, err = newRecorder(pcount(sc.params.Duration, sc.params.Interval), sc.TimeSource,
+		sc.rHandler); err != nil {
+		return
 	}
 
 	// prepare and send open reply
@@ -96,8 +106,14 @@ func (sc *sconn) serve(p *packet) (closed bool, err error) {
 		err = sc.serveClose(p)
 		return
 	}
-	closed, err = sc.serveEcho(p)
-	return
+
+	if sc.params.TripMode == TMRound {
+		closed, err = sc.serveEcho(p)
+		return
+	} else if sc.params.TripMode == TMOneWay {
+		closed, err = sc.serveNoEcho(p)
+		return
+	}
 }
 
 func (sc *sconn) serveClose(p *packet) (err error) {
@@ -259,6 +275,150 @@ func (sc *sconn) serveEcho(p *packet) (closed bool, err error) {
 	return
 }
 
+func (sc *sconn) serveNoEcho(p *packet) (closed bool, err error) {
+	// handle echo request
+	if err = p.addFields(fechoRequest, false); err != nil {
+		return
+	}
+
+	// check that request isn't too large
+	if sc.MaxLength > 0 && p.length() > sc.MaxLength {
+		err = Errorf(LargeRequest, "request too large (%d > %d)",
+			p.length(), sc.MaxLength)
+		return
+	}
+
+	// update first used
+	now := time.Now()
+	if sc.firstUsed.IsZero() {
+		sc.firstUsed = now
+	}
+
+	// enforce minimum interval
+	if sc.MinInterval > 0 {
+		if !sc.lastUsed.IsZero() {
+			earned := float64(now.Sub(sc.lastUsed)) / float64(sc.MinInterval)
+			sc.packetBucket += earned
+			if sc.packetBucket > float64(sc.PacketBurst) {
+				sc.packetBucket = float64(sc.PacketBurst)
+			}
+		}
+		if sc.packetBucket < 1 {
+			sc.lastUsed = now
+			err = Errorf(ShortInterval, "drop due to short packet interval")
+			return
+		}
+		sc.packetBucket--
+	}
+
+	// set reply flag
+	p.setReply(true)
+
+	// update last used
+	sc.lastUsed = now
+
+	// slide received seqno window
+	seqno := p.seqno()
+	sinceLastSeqno := seqno - sc.lastSeqno
+	if sinceLastSeqno > 0 {
+		sc.receivedWindow <<= sinceLastSeqno
+	}
+	if sinceLastSeqno >= 0 { // new, duplicate or first packet
+		sc.receivedWindow |= 0x1
+		sc.rwinValid = true
+	} else { // late packet
+		sc.receivedWindow |= (0x1 << -sinceLastSeqno)
+		sc.rwinValid = false
+	}
+	// update received count
+	sc.receivedCount++
+	// update seqno and last used times
+	sc.lastSeqno = seqno
+
+	// check if max test duration exceeded (but still return packet)
+	if sc.MaxDuration > 0 && time.Since(sc.firstUsed) >
+		sc.MaxDuration+maxDurationGrace {
+		sc.eventf(ExceededDuration, p.raddr,
+			"closing connection due to duration limit exceeded")
+		sc.cmgr.remove(sc.ctoken)
+		p.setFlagBits(flClose)
+		closed = true
+	}
+
+	// set packet dscp value
+	if sc.AllowDSCP && sc.conn.dscpSupport {
+		p.dscp = sc.params.DSCP
+	}
+
+	// set source IP, if necessary
+	if sc.SetSrcIP {
+		p.srcIP = p.dstIP
+	}
+
+	// initialize test packet
+	p.setLen(0)
+
+	// set received stats
+	if sc.params.ReceivedStats&ReceivedStatsCount != 0 {
+		p.setReceivedCount(sc.receivedCount)
+	}
+	if sc.params.ReceivedStats&ReceivedStatsWindow != 0 {
+		if sc.rwinValid {
+			p.setReceivedWindow(sc.receivedWindow)
+		} else {
+			p.setReceivedWindow(0)
+		}
+	}
+
+	// set timestamps
+	at := sc.params.StampAt
+	cl := sc.params.Clock
+	if at != AtNone {
+		var rt Time
+		var st Time
+		if at == AtMidpoint {
+			mt := p.trcvd.Midpoint(sc.TimeSource.Now(cl))
+			rt = mt
+			st = mt
+		} else {
+			if at&AtReceive != 0 {
+				rt = p.trcvd.KeepClocks(cl)
+			}
+			if at&AtSend != 0 {
+				st = sc.TimeSource.Now(cl)
+			}
+		}
+		p.setTimestamp(at, Timestamp{rt, st})
+	} else {
+		p.removeTimestamps()
+	}
+
+	// set length
+	p.setLen(sc.params.Length)
+
+	// add expected echo reply fields
+	p.addFields(fechoReply, false)
+
+	// add expected received stats fields
+	p.addReceivedStatsFields(sc.params.ReceivedStats)
+
+	// add expected timestamp fields
+	p.addTimestampFields(sc.params.StampAt, sc.params.Clock)
+
+	// get timestamps and return an error if the timestamp setting is
+	// different (server doesn't support timestamps)
+	sts := p.timestamp()
+
+	// record receive if all went well (may fail if seqno not found)
+	ok := sc.rec.recordReceive(p, &sts)
+	if !ok {
+		err = Errorf(UnexpectedSequenceNumber, "unexpected reply sequence number %d", p.seqno())
+		return
+	}
+
+	return
+}
+
 func (sc *sconn) expired() bool {
 	if sc.Timeout == 0 {
 		return false
@@ -291,4 +451,13 @@ func (sc *sconn) restrictParams(p *Params) {
 		p.ServerFill = DefaultServerFiller.String()
 	}
 	return
+}
+
+// sconnHandler is called with serverConnection events, as well as separately when
+// packets are sent and received. See the documentation for Recorder for
+// information on locking for concurrent access.
+type sconnHandler interface {
+	Handler
+
+	RecorderHandler
 }

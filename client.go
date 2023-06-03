@@ -287,7 +287,9 @@ func (c *Client) send(ctx context.Context) error {
 	}
 	p.addFields(fechoRequest, true)
 	p.zeroReceivedStats(c.ReceivedStats)
-	p.stampZeroes(c.StampAt, c.Clock)
+	if c.TripMode == TMRound {
+		p.stampZeroes(c.StampAt, c.Clock)
+	}
 	p.setSeqno(seqno)
 
 	// set packet len and notify receive
@@ -318,6 +320,11 @@ func (c *Client) send(ctx context.Context) error {
 		tsend := c.rec.recordPreSend()
 		var err error
 		if clientDropsPercent == 0 || rand.Float32() > clientDropsPercent {
+			if c.TripMode == TMOneWay {
+				mt := c.TimeSource.Now(c.Clock)
+				fmt.Println(Timestamp{Time{}, mt})
+				p.setTimestamp(AtSend, Timestamp{Time{}, mt})
+			}
 			err = c.conn.send(p)
 		} else {
 			// simulate drop with an average send time

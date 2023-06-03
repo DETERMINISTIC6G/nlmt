@@ -1,8 +1,16 @@
 package nlmt
 
 import (
+	"compress/gzip"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
 	"math/rand"
 	"net"
+	"os"
+	"strings"
+	"text/tabwriter"
 	"time"
 )
 
@@ -20,10 +28,10 @@ type sconn struct {
 	lastSeqno      Seqno
 	receivedCount  ReceivedCount
 	receivedWindow ReceivedWindow
-	rHandler       sconnHandler
+	rHandler       SConnHandler
 	rwinValid      bool
 	bytes          uint64
-	rec            *Recorder
+	rec            *OneWayRecorder
 }
 
 func newSconn(l *listener, raddr *net.UDPAddr) *sconn {
@@ -76,10 +84,17 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 		l.eventf(NewConn, p.raddr, "new connection, token=%016x, trip-mode=%s", sc.ctoken, sc.params.TripMode)
 	}
 
-	// create recorder
-	if sc.rec, err = newRecorder(pcount(sc.params.Duration, sc.params.Interval), sc.TimeSource,
-		sc.rHandler); err != nil {
-		return
+	// add recorder handler
+	var quiet = false
+	var reallyQuiet = false
+	sc.rHandler = &sconnHandler{p.raddr, quiet, reallyQuiet}
+
+	// create recorder if oneway
+	if params.TripMode == TMOneWay {
+		if sc.rec, err = newOneWayRecorder(pcount(sc.params.Duration, sc.params.Interval), sc.TimeSource,
+			sc.rHandler); err != nil {
+			return
+		}
 	}
 
 	// prepare and send open reply
@@ -273,6 +288,7 @@ func (sc *sconn) serveEcho(p *packet) (closed bool, err error) {
 }
 
 func (sc *sconn) serveNoEcho(p *packet) (closed bool, err error) {
+
 	// handle echo request
 	if err = p.addFields(fechoRequest, false); err != nil {
 		return
@@ -308,9 +324,6 @@ func (sc *sconn) serveNoEcho(p *packet) (closed bool, err error) {
 		sc.packetBucket--
 	}
 
-	// set reply flag
-	p.setReply(true)
-
 	// update last used
 	sc.lastUsed = now
 
@@ -338,72 +351,18 @@ func (sc *sconn) serveNoEcho(p *packet) (closed bool, err error) {
 		sc.eventf(ExceededDuration, p.raddr,
 			"closing connection due to duration limit exceeded")
 		sc.cmgr.remove(sc.ctoken)
-		p.setFlagBits(flClose)
 		closed = true
 	}
 
-	// set packet dscp value
-	if sc.AllowDSCP && sc.conn.dscpSupport {
-		p.dscp = sc.params.DSCP
-	}
-
-	// set source IP, if necessary
-	if sc.SetSrcIP {
-		p.srcIP = p.dstIP
-	}
-
-	// initialize test packet
-	p.setLen(0)
-
-	// set received stats
-	if sc.params.ReceivedStats&ReceivedStatsCount != 0 {
-		p.setReceivedCount(sc.receivedCount)
-	}
-	if sc.params.ReceivedStats&ReceivedStatsWindow != 0 {
-		if sc.rwinValid {
-			p.setReceivedWindow(sc.receivedWindow)
-		} else {
-			p.setReceivedWindow(0)
-		}
-	}
-
-	// set timestamps
-	at := sc.params.StampAt
-	cl := sc.params.Clock
-	if at != AtNone {
-		var rt Time
-		var st Time
-		if at == AtMidpoint {
-			mt := p.trcvd.Midpoint(sc.TimeSource.Now(cl))
-			rt = mt
-			st = mt
-		} else {
-			if at&AtReceive != 0 {
-				rt = p.trcvd.KeepClocks(cl)
-			}
-			if at&AtSend != 0 {
-				st = sc.TimeSource.Now(cl)
-			}
-		}
-		p.setTimestamp(at, Timestamp{rt, st})
-	} else {
-		p.removeTimestamps()
-	}
-
-	// set length
-	p.setLen(sc.params.Length)
-
-	// add expected echo reply fields
-	p.addFields(fechoReply, false)
-
 	// add expected received stats fields
-	p.addReceivedStatsFields(sc.params.ReceivedStats)
+	p.addReceivedStatsFields(ReceivedStatsBoth)
 
 	// add expected timestamp fields
-	p.addTimestampFields(sc.params.StampAt, sc.params.Clock)
+	p.addTimestampFields(AtSend, BothClocks)
 
-	// get timestamps and return an error if the timestamp setting is
-	// different (server doesn't support timestamps)
+	// get timestamps
+	p.stampAt()
+	p.clock()
 	sts := p.timestamp()
 
 	// record receive if all went well (may fail if seqno not found)
@@ -450,11 +409,142 @@ func (sc *sconn) restrictParams(p *Params) {
 	return
 }
 
-// sconnHandler is called with serverConnection events, as well as separately when
+// SConnHandler is called with serverConnection events, as well as separately when
 // packets are sent and received. See the documentation for Recorder for
 // information on locking for concurrent access.
-type sconnHandler interface {
+type SConnHandler interface {
 	Handler
 
-	RecorderHandler
+	OneWayRecorderHandler
+}
+
+func printOneWayResult(r *OneWayResult) {
+	// set some stat variables for later brevity
+	sds := r.SendDelayStats
+	svs := r.SendIPDVStats
+
+	if r.SendErr != nil {
+		if r.SendErr != context.Canceled {
+			printf("\nTerminated due to send error: %s", r.SendErr)
+		}
+	}
+	printf("")
+
+	printStats := func(title string, s DurationStats) {
+		if s.N > 0 {
+			var med string
+			if m, ok := s.Median(); ok {
+				med = rdur(m).String()
+			}
+			printf("%s\t%s\t%s\t%s\t%s\t%s\t", title, rdur(s.Min), rdur(s.Mean()),
+				med, rdur(s.Max), rdur(s.Stddev()))
+		}
+	}
+
+	setTabWriter(tabwriter.AlignRight)
+
+	printf("\tMin\tMean\tMedian\tMax\tStddev\t")
+	printf("\t---\t----\t------\t---\t------\t")
+	printStats("send delay", sds)
+	printf("\t\t\t\t\t\t")
+	printStats("send IPDV", svs)
+	printf("")
+	printf("                duration: %s (wait %s)", rdur(r.Duration), rdur(r.Wait))
+	printf("   packets sent/received: %d/%d (%.2f%% loss)", r.ExpectedPacketsSent,
+		r.PacketsReceived, r.PacketLossPercent)
+	if r.Duplicates > 0 {
+		printf("          *** DUPLICATES: %d (%.2f%%)", r.Duplicates,
+			r.DuplicatePercent)
+	}
+	if r.LatePackets > 0 {
+		printf("late (out-of-order) pkts: %d (%.2f%%)", r.LatePackets,
+			r.LatePacketsPercent)
+	}
+	printf("     bytes received: %d", r.BytesReceived)
+	printf("       receive rate: %s", r.ReceiveRate)
+	printf("           packet length: %d bytes", r.Config.Length)
+
+	flush()
+}
+
+func writeOneWayResultJSON(r *OneWayResult, output string, cancelled bool) error {
+	var jout io.Writer
+
+	var gz bool
+	if output == "-" {
+		if cancelled {
+			return nil
+		}
+		jout = os.Stdout
+	} else {
+		gz = true
+		if strings.HasSuffix(output, ".json") {
+			gz = false
+		} else if !strings.HasSuffix(output, ".json.gz") {
+			if strings.HasSuffix(output, ".gz") {
+				output = output[:len(output)-3] + ".json.gz"
+			} else {
+				output = output + ".json.gz"
+			}
+		}
+		of, err := os.Create(output)
+		if err != nil {
+			exitOnError(err, exitCodeRuntimeError)
+		}
+		defer of.Close()
+		jout = of
+	}
+	if gz {
+		gzw := gzip.NewWriter(jout)
+		defer func() {
+			gzw.Flush()
+			gzw.Close()
+		}()
+		jout = gzw
+	}
+	e := json.NewEncoder(jout)
+	e.SetIndent("", "    ")
+	return e.Encode(r)
+}
+
+type sconnHandler struct {
+	raddr       *net.UDPAddr
+	quiet       bool
+	reallyQuiet bool
+}
+
+func (sc *sconnHandler) OneWayOnReceived(seqno Seqno, owtd *OneWayTripData,
+	powtd *OneWayTripData, late bool, dup bool) {
+	if !sc.reallyQuiet {
+		if dup {
+			printf("DUP! seq=%d", seqno)
+			return
+		}
+
+		if !sc.quiet {
+			ipdv := "n/a"
+			if powtd != nil {
+				dv := owtd.SendIPDVSince(powtd)
+				if dv != InvalidDuration {
+					ipdv = rdur(AbsDuration(dv)).String()
+				}
+			}
+			sd := ""
+			if owtd.SendDelay() != InvalidDuration {
+				sd = fmt.Sprintf(" sd=%s", rdur(owtd.SendDelay()))
+			}
+			sl := ""
+			if late {
+				sl = " (LATE)"
+			}
+			printf("[%s] seq=%d %s ipdv=%s%s", sc.raddr, seqno,
+				sd, ipdv, sl)
+		}
+	}
+}
+
+func (sc *sconnHandler) OnEvent(e *Event) {
+	if !sc.reallyQuiet {
+		printf("%s %s", sc.raddr, e)
+	}
 }

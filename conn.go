@@ -280,6 +280,7 @@ func (c *cconn) receive(p *packet) (err error) {
 	} else {
 		n, err = c.conn.Read(p.readTo())
 	}
+
 	p.trcvd = c.timeSource.Now(BothClocks)
 	p.tsent = Time{}
 	p.dscp = 0
@@ -441,6 +442,7 @@ func (l *lconn) receive(p *packet) (err error) {
 			p.dstIP = nil
 		}
 	}
+
 	p.srcIP = nil
 	p.dscp = 0
 	p.trcvd = l.timeSource.Now(BothClocks)

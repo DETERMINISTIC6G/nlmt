@@ -1,7 +1,6 @@
 package nlmt
 
 import (
-	"fmt"
 	"math/rand"
 	"net"
 	"time"
@@ -45,7 +44,6 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 	// parse, restrict and set params
 	var params *Params
 	params, err = parseParams(p.payload())
-	fmt.Printf("%+v\n", params)
 	if err != nil {
 		return
 	}

@@ -289,6 +289,9 @@ func (c *Client) send(ctx context.Context) error {
 	p.zeroReceivedStats(c.ReceivedStats)
 	if c.TripMode == TMRound {
 		p.stampZeroes(c.StampAt, c.Clock)
+	} else {
+		mt := c.TimeSource.Now(c.Clock)
+		p.setTimestamp(AtSend, Timestamp{Time{}, mt})
 	}
 	p.setSeqno(seqno)
 

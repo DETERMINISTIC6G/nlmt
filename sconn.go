@@ -113,11 +113,11 @@ func replaceXWithIPPortDateTime(addr *net.UDPAddr, format string) string {
 
 	replacements := map[string]string{
 		"x": ip + "-" + port,
-		"m": fmt.Sprintf("%02d", now.Month()),
-		"d": fmt.Sprintf("%02d", now.Day()),
-		"h": fmt.Sprintf("%02d", now.Hour()),
-		"t": fmt.Sprintf("%02d", now.Minute()),
-		"w": fmt.Sprintf("%02d", now.Second()),
+		"m": fmt.Sprintf("%d", now.Month()),
+		"d": fmt.Sprintf("%d", now.Day()),
+		"h": fmt.Sprintf("%d", now.Hour()),
+		"t": fmt.Sprintf("%d", now.Minute()),
+		"w": fmt.Sprintf("%d", now.Second()),
 	}
 
 	for k, v := range replacements {
@@ -137,23 +137,25 @@ func (sc *sconn) serve(p *packet) (closed bool, err error) {
 		closed = true
 		err = sc.serveClose(p)
 
-		// print results
-		r := newOneWayResult(sc.rec, sc.listener.ServerConfig)
-		if !*&sc.listener.ServerConfig.ReallyQuiet {
-			printOneWayResult(r)
-		}
-
-		// write results to JSON
-		if sc.listener.ServerConfig.OutputJSON {
-			var fileAddr string
-			if sc.listener.ServerConfig.OutputJSONAddr == "" {
-				fileAddr = replaceXWithIPPortDateTime(sc.raddr, DefaultJSONAddrFormat)
-			} else {
-				fileAddr = sc.listener.ServerConfig.OutputJSONAddr
+		if sc.params.TripMode == TMOneWay {
+			// print results
+			r := newOneWayResult(sc.rec, sc.listener.ServerConfig)
+			if !*&sc.listener.ServerConfig.ReallyQuiet {
+				printOneWayResult(r)
 			}
 
-			if err := writeOneWayResultJSON(r, fileAddr, false); err != nil {
-				exitOnError(err, exitCodeRuntimeError)
+			// write results to JSON
+			if sc.listener.ServerConfig.OutputJSON {
+				var fileAddr string
+				if sc.listener.ServerConfig.OutputJSONAddr == "" {
+					fileAddr = replaceXWithIPPortDateTime(sc.raddr, DefaultJSONAddrFormat)
+				} else {
+					fileAddr = sc.listener.ServerConfig.OutputJSONAddr
+				}
+
+				if err := writeOneWayResultJSON(r, fileAddr, false); err != nil {
+					exitOnError(err, exitCodeRuntimeError)
+				}
 			}
 		}
 

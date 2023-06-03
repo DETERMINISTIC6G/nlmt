@@ -58,6 +58,13 @@ var DefaultTimer = NewCompTimer(DefaultCompTimerAverage)
 // for Windows and GoTimeSource for everything else).
 var DefaultTimeSource = NewDefaultTimeSource()
 
+// output file for each connection
+var DefaultOutputJSON = false
+var DefaultOutputJSONAddr = ""
+
+// x is the ip and port, d: dat, h: hour, t: minute, w:second
+var DefaultJSONAddrFormat = "x_m-d-h-t-w.json.gz"
+
 // DefaultFillPattern is the default fill pattern.
 var DefaultFillPattern = []byte("irtt")
 

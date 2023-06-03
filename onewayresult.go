@@ -9,26 +9,26 @@ import (
 type OneWayResult struct {
 	VersionInfo  *VersionInfo  `json:"version"`
 	SystemInfo   *SystemInfo   `json:"system_info"`
-	Config       *ClientConfig `json:"config"`
+	Config       *ServerConfig `json:"config"`
 	SendErr      error         `json:"send_err,omitempty"`
 	ReceiveErr   error         `json:"receive_err,omitempty"`
 	*OneWayStats `json:"stats"`
 	OneWayTrips  []OneWayTrip `json:"round_trips"`
+	PacketLength uint         `json:"packet_length"`
 }
 
-func newOneWayResult(rec *OneWayRecorder, cfg *ClientConfig, serr error, rerr error) *OneWayResult {
+func newOneWayResult(rec *OneWayRecorder, cfg *ServerConfig) *OneWayResult {
 	stats := &OneWayStats{OneWayRecorder: rec}
 	r := &OneWayResult{
-		VersionInfo: NewVersionInfo(),
-		SystemInfo:  NewSystemInfo(),
-		Config:      cfg,
-		SendErr:     serr,
-		ReceiveErr:  rerr,
-		OneWayStats: stats,
+		VersionInfo:  NewVersionInfo(),
+		SystemInfo:   NewSystemInfo(),
+		Config:       cfg,
+		OneWayStats:  stats,
+		PacketLength: rec.PacketLength,
 	}
 
 	// calculate total duration (monotonic time since start)
-	r.Duration = cfg.TimeSource.Now(Monotonic).Sub(r.Start)
+	r.Duration = cfg.TimeSource.Now(Monotonic).Sub(rec.Start)
 
 	// create RoundTrips array
 	r.OneWayTrips = make([]OneWayTrip, len(rec.OneWayTripData))
@@ -36,30 +36,6 @@ func newOneWayResult(rec *OneWayRecorder, cfg *ClientConfig, serr error, rerr er
 		rt := &r.OneWayTrips[i]
 		rt.Seqno = Seqno(i)
 		rt.OneWayTripData = &r.OneWayTripData[i]
-		// use received window to update lost status of previous round trips
-		if rt.Arrived() {
-			rt.Lost = LostFalse
-			rwin := rt.OneWayTripData.receivedWindow
-			if cfg.Params.ReceivedStats&ReceivedStatsWindow != 0 && (rwin&0x1 != 0) {
-				rwin >>= 1
-				wend := i - 63
-				if wend < 0 {
-					wend = 0
-				}
-				for j := i - 1; j >= wend; j-- {
-					rcvd := (rwin&0x1 != 0)
-					prt := &r.OneWayTrips[j]
-					if rcvd {
-						if prt.Lost != LostFalse {
-							prt.Lost = LostDown
-						}
-					} else if prt.Lost == LostTrue || prt.Lost == LostUp {
-						prt.Lost = LostUp
-					} // else don't allow a transition from not lost to lost
-					rwin >>= 1
-				}
-			}
-		}
 		// calculate IPDV
 		rt.SendIPDV = InvalidDuration
 		if i > 0 {

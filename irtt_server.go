@@ -21,6 +21,14 @@ func serverUsage() {
 	printf("               %%iface (all addresses on interface iface with default port %s)", DefaultPort)
 	printf("               %%iface:port (all addresses on interface iface with port)")
 	printf("               note: iface strings may contain * to match multiple interfaces")
+	printf("-o file        write JSON output to file (use '-' for stdout, 'd' for default filename)")
+	printf("               if file has no extension, .json.gz is added, output is gzipped")
+	printf("               if extension is .json.gz, output is gzipped")
+	printf("               if extension is .gz, it's changed to .json.gz, output is gzipped")
+	printf("               if extension is .json, output is not gzipped")
+	printf("               output to stdout is not gzipped, pipe to gzip if needed")
+	printf("-q             quiet, suppress per-packet output")
+	printf("-Q             really quiet, suppress all output except errors to stderr")
 	printf("-d duration    max test duration, or 0 for no maximum")
 	printf("               (default %s, see Duration units below)", DefaultMaxDuration)
 	printf("-i interval    min send interval, or 0 for no minimum")
@@ -103,6 +111,9 @@ func runServerCLI(args []string) {
 	var ecn = fs.Bool("ecn", DefaultSetECN, "enable ECN capture - disables UDP replies from server")
 	var lockOSThread = fs.Bool("thread", DefaultThreadLock, "thread")
 	var version = fs.BoolP("version", "v", false, "version")
+	var outputStr = fs.StringP("o", "o", "", "output file")
+	var quiet = fs.BoolP("q", "q", defaultQuiet, "quiet")
+	var reallyQuiet = fs.BoolP("Q", "Q", defaultReallyQuiet, "really quiet")
 	fs.Parse(args)
 
 	// start profiling, if enabled in build
@@ -162,6 +173,16 @@ func runServerCLI(args []string) {
 	cfg.IPVersion = ipVer
 	cfg.SetSrcIP = *setSrcIP || *ecn
 	cfg.ThreadLock = *lockOSThread
+	cfg.Quiet = *quiet
+	cfg.ReallyQuiet = *reallyQuiet
+	if *outputStr == "" {
+		cfg.OutputJSON = false
+	} else if *outputStr == "d" {
+		cfg.OutputJSON = true
+	} else {
+		cfg.OutputJSON = true
+		cfg.OutputJSONAddr = *outputStr
+	}
 
 	// create server
 	s := NewServer(cfg)

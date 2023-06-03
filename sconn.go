@@ -85,13 +85,11 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 	}
 
 	// add recorder handler
-	var quiet = false
-	var reallyQuiet = false
-	sc.rHandler = &sconnHandler{p.raddr, quiet, reallyQuiet}
+	sc.rHandler = &sconnHandler{p.raddr, sc.listener.ServerConfig.Quiet, sc.listener.ServerConfig.ReallyQuiet}
 
 	// create recorder if oneway
 	if params.TripMode == TMOneWay {
-		if sc.rec, err = newOneWayRecorder(pcount(sc.params.Duration, sc.params.Interval), sc.TimeSource,
+		if sc.rec, err = newOneWayRecorder(pcount(sc.params.Duration, sc.params.Interval), uint(sc.params.Length), sc.TimeSource,
 			sc.rHandler); err != nil {
 			return
 		}
@@ -108,6 +106,27 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 	return
 }
 
+func replaceXWithIPPortDateTime(addr *net.UDPAddr, format string) string {
+	ip := strings.Replace(addr.IP.String(), ".", "-", -1)
+	port := fmt.Sprintf("%d", addr.Port)
+	now := time.Now()
+
+	replacements := map[string]string{
+		"x": ip + "-" + port,
+		"m": fmt.Sprintf("%02d", now.Month()),
+		"d": fmt.Sprintf("%02d", now.Day()),
+		"h": fmt.Sprintf("%02d", now.Hour()),
+		"t": fmt.Sprintf("%02d", now.Minute()),
+		"w": fmt.Sprintf("%02d", now.Second()),
+	}
+
+	for k, v := range replacements {
+		format = strings.Replace(format, k, v, -1)
+	}
+
+	return format
+}
+
 func (sc *sconn) serve(p *packet) (closed bool, err error) {
 	if !udpAddrsEqual(p.raddr, sc.raddr) {
 		err = Errorf(AddressMismatch, "address mismatch (expected %s for %016x)",
@@ -117,6 +136,27 @@ func (sc *sconn) serve(p *packet) (closed bool, err error) {
 	if p.flags()&flClose != 0 {
 		closed = true
 		err = sc.serveClose(p)
+
+		// print results
+		r := newOneWayResult(sc.rec, sc.listener.ServerConfig)
+		if !*&sc.listener.ServerConfig.ReallyQuiet {
+			printOneWayResult(r)
+		}
+
+		// write results to JSON
+		if sc.listener.ServerConfig.OutputJSON {
+			var fileAddr string
+			if sc.listener.ServerConfig.OutputJSONAddr == "" {
+				fileAddr = replaceXWithIPPortDateTime(sc.raddr, DefaultJSONAddrFormat)
+			} else {
+				fileAddr = sc.listener.ServerConfig.OutputJSONAddr
+			}
+
+			if err := writeOneWayResultJSON(r, fileAddr, false); err != nil {
+				exitOnError(err, exitCodeRuntimeError)
+			}
+		}
+
 		return
 	}
 
@@ -462,7 +502,7 @@ func printOneWayResult(r *OneWayResult) {
 	}
 	printf("     bytes received: %d", r.BytesReceived)
 	printf("       receive rate: %s", r.ReceiveRate)
-	printf("           packet length: %d bytes", r.Config.Length)
+	printf("           packet length: %d bytes", r.PacketLength)
 
 	flush()
 }

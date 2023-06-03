@@ -322,7 +322,6 @@ func (c *Client) send(ctx context.Context) error {
 		if clientDropsPercent == 0 || rand.Float32() > clientDropsPercent {
 			if c.TripMode == TMOneWay {
 				mt := c.TimeSource.Now(c.Clock)
-				fmt.Println(Timestamp{Time{}, mt})
 				p.setTimestamp(AtSend, Timestamp{Time{}, mt})
 			}
 			err = c.conn.send(p)

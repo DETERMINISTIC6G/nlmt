@@ -109,11 +109,10 @@ func (sc *sconn) serve(p *packet) (closed bool, err error) {
 
 	if sc.params.TripMode == TMRound {
 		closed, err = sc.serveEcho(p)
-		return
 	} else if sc.params.TripMode == TMOneWay {
 		closed, err = sc.serveNoEcho(p)
-		return
 	}
+	return
 }
 
 func (sc *sconn) serveClose(p *packet) (err error) {

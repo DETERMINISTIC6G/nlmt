@@ -339,12 +339,12 @@ func runClientCLI(args []string) {
 	}
 
 	// print results
-	if !*reallyQuiet {
+	if !*reallyQuiet && (tm == TMRound) {
 		printResult(r)
 	}
 
 	// write results to JSON
-	if *outputStr != "" {
+	if (*outputStr != "") && (tm == TMRound) {
 		if err := writeResultJSON(r, *outputStr, ctx.Err() != nil); err != nil {
 			exitOnError(err, exitCodeRuntimeError)
 		}

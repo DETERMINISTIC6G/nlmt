@@ -14,7 +14,7 @@ type OneWayResult struct {
 	SendErr      error         `json:"send_err,omitempty"`
 	ReceiveErr   error         `json:"receive_err,omitempty"`
 	*OneWayStats `json:"stats"`
-	OneWayTrips  []OneWayTrip `json:"round_trips"`
+	OneWayTrips  []OneWayTrip `json:"oneway_trips"`
 	PacketLength uint         `json:"packet_length"`
 }
 
@@ -109,7 +109,6 @@ func (r *OneWayResult) visitStats(ds *DurationStats, push bool,
 // OneWayTrip stores the Timestamps and statistics for a single oneway trip.
 type OneWayTrip struct {
 	Seqno           Seqno `json:"seqno"`
-	Lost            Lost  `json:"lost"`
 	*OneWayTripData `json:"timestamps"`
 	SendIPDV        time.Duration `json:"-"`
 }

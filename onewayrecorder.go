@@ -36,7 +36,8 @@ type OneWayRecorder struct {
 // OneWayTripData contains the information recorded for each round trip during
 // the test.
 type OneWayTripData struct {
-	Timestamp      Timestamp `json:"client"`
+	Client         Timestamp `json:"client"`
+	Server         Timestamp `json:"server"`
 	receivedWindow ReceivedWindow
 	Ecn            int
 }
@@ -94,7 +95,7 @@ func (r *OneWayRecorder) recordReceive(p *packet, sts *Timestamp) bool {
 	owtd.Ecn = p.ecn
 
 	// check for duplicate (don't update stats for duplicates)
-	if !owtd.Timestamp.Receive.IsZero() {
+	if !owtd.Server.Receive.IsZero() {
 		r.Duplicates++
 
 		// remove the appended onewaytripdata
@@ -114,11 +115,11 @@ func (r *OneWayRecorder) recordReceive(p *packet, sts *Timestamp) bool {
 	r.lastSeqno = seqno
 
 	// update times
-	owtd.Timestamp.Send = sts.Send
-	owtd.Timestamp.Receive = p.trcvd
+	owtd.Client.Send = sts.Send
+	owtd.Server.Receive = p.trcvd
 
 	// update one-way delay stats
-	if !owtd.Timestamp.BestReceive().IsWallZero() {
+	if !owtd.Server.BestReceive().IsWallZero() {
 		r.SendDelayStats.push(owtd.SendDelay())
 	}
 
@@ -146,7 +147,7 @@ func (r *OneWayRecorder) recordReceive(p *packet, sts *Timestamp) bool {
 
 // Arrived returns true if a packet was received from the sender.
 func (ts *OneWayTripData) Arrived() bool {
-	return !ts.Timestamp.Receive.IsZero()
+	return !ts.Server.Receive.IsZero()
 }
 
 // SendIPDVSince returns the send instantaneous packet delay variation since the
@@ -169,13 +170,13 @@ func (ts *OneWayTripData) SendDelay() time.Duration {
 	if !ts.IsWallTimestamped() {
 		return InvalidDuration
 	}
-	return time.Duration(ts.Timestamp.BestReceive().Wall - ts.Timestamp.Send.Wall)
+	return time.Duration(ts.Server.BestReceive().Wall - ts.Client.Send.Wall)
 }
 
 // SendMonoDiff returns the difference in send values from the monotonic clock.
 // This is useful for measuring send IPDV (jitter), but not for absolute send delay.
 func (ts *OneWayTripData) SendMonoDiff() time.Duration {
-	return ts.Timestamp.BestReceive().Mono - ts.Timestamp.Send.Mono
+	return ts.Server.BestReceive().Mono - ts.Client.Send.Mono
 }
 
 // SendWallDiff returns the difference in send values from the wall
@@ -183,7 +184,7 @@ func (ts *OneWayTripData) SendMonoDiff() time.Duration {
 // absolute send delay. Because the wall clock is used, it is subject to wall
 // clock variability.
 func (ts *OneWayTripData) SendWallDiff() time.Duration {
-	return time.Duration(ts.Timestamp.BestReceive().Wall - ts.Timestamp.Send.Wall)
+	return time.Duration(ts.Server.BestReceive().Wall - ts.Client.Send.Wall)
 }
 
 // IsTimestamped returns true if the server returned any timestamp.
@@ -194,23 +195,23 @@ func (ts *OneWayTripData) IsTimestamped() bool {
 // IsMonoTimestamped returns true if the server returned any timestamp with a
 // valid monotonic clock value.
 func (ts *OneWayTripData) IsMonoTimestamped() bool {
-	return !ts.Timestamp.Receive.IsMonoZero() || !ts.Timestamp.Send.IsMonoZero()
+	return !ts.Server.Receive.IsMonoZero() || !ts.Client.Send.IsMonoZero()
 }
 
 // IsWallTimestamped returns true if the server returned any timestamp with a
 // valid wall clock value.
 func (ts *OneWayTripData) IsWallTimestamped() bool {
-	return !ts.Timestamp.Receive.IsWallZero() || !ts.Timestamp.Send.IsWallZero()
+	return !ts.Server.Receive.IsWallZero() || !ts.Client.Send.IsWallZero()
 }
 
 // IsReceiveTimestamped returns true if the server returned a receive timestamp.
 func (ts *OneWayTripData) IsReceiveTimestamped() bool {
-	return !ts.Timestamp.Receive.IsZero()
+	return !ts.Server.Receive.IsZero()
 }
 
 // IsSendTimestamped returns true if the server returned a send timestamp.
 func (ts *OneWayTripData) IsSendTimestamped() bool {
-	return !ts.Timestamp.Send.IsZero()
+	return !ts.Client.Send.IsZero()
 }
 
 // IsBothTimestamped returns true if the server returned both a send and receive

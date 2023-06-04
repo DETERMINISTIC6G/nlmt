@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Added --ecn server option to ship ECN bits (currently IPv6 only)
 
+## 0.9.2 - 2023-06-21
+
+### Added
+
+- Add oneway test packets from client to server (needs external clock sync 
+  between client and server machines, `--tripm` flag)
+- At the server the output file could be saved
+
 ## 0.9.1 - 2021-05-18
 
 ### Added

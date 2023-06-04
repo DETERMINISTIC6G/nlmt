@@ -89,7 +89,7 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 
 	// create recorder if oneway
 	if params.TripMode == TMOneWay {
-		if sc.rec, err = newOneWayRecorder(pcount(sc.params.Duration, sc.params.Interval), uint(sc.params.Length), sc.TimeSource,
+		if sc.rec, err = newOneWayRecorder(pcount(sc.params.Duration, sc.params.Interval), uint(sc.params.Length), sc.params.Interval, sc.TimeSource,
 			sc.rHandler); err != nil {
 			return
 		}
@@ -492,7 +492,7 @@ func printOneWayResult(r *OneWayResult) {
 	printStats("send IPDV", svs)
 	printf("")
 	printf("                duration: %s (wait %s)", rdur(r.Duration), rdur(r.Wait))
-	printf("   packets sent/received: %d/%d (%.2f%% loss)", r.ExpectedPacketsSent,
+	printf("   packets sent/received: %d/%d (%.2f%% loss)", r.lastSeqno+1,
 		r.PacketsReceived, r.PacketLossPercent)
 	if r.Duplicates > 0 {
 		printf("          *** DUPLICATES: %d (%.2f%%)", r.Duplicates,

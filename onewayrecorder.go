@@ -20,6 +20,7 @@ type OneWayRecorder struct {
 	SendDelayStats        DurationStats         `json:"delay"`
 	PacketsReceived       ReceivedCount         `json:"packets_received"`
 	ExpectedPacketsSent   uint                  `json:"expected_packets_received"`
+	Interval              time.Duration         `json:"interval"`
 	BytesReceived         uint64                `json:"bytes_received"`
 	Duplicates            uint                  `json:"duplicates"`
 	LatePackets           uint                  `json:"late_packets"`
@@ -50,7 +51,7 @@ func (r *Recorder) OWRUnlock() {
 	r.mtx.RUnlock()
 }
 
-func newOneWayRecorder(owtrips uint, pcktlen uint, ts TimeSource, h OneWayRecorderHandler) (rec *OneWayRecorder, err error) {
+func newOneWayRecorder(owtrips uint, pcktlen uint, interval time.Duration, ts TimeSource, h OneWayRecorderHandler) (rec *OneWayRecorder, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = Errorf(AllocateResultsPanic,
@@ -62,8 +63,8 @@ func newOneWayRecorder(owtrips uint, pcktlen uint, ts TimeSource, h OneWayRecord
 		OneWayTripData:        make([]OneWayTripData, 0, owtrips),
 		OneWayRecorderHandler: h,
 		timeSource:            ts,
-		ExpectedPacketsSent:   owtrips,
 		PacketLength:          pcktlen,
+		Interval:              interval,
 		Start:                 ts.Now(Monotonic),
 	}
 	return

@@ -2,6 +2,7 @@ package nlmt
 
 import (
 	"encoding/json"
+	"math"
 	"time"
 )
 
@@ -62,10 +63,13 @@ func newOneWayResult(rec *OneWayRecorder, cfg *ServerConfig) *OneWayResult {
 	// calculate send rate
 	r.ReceiveRate = calculateBitrate(r.BytesReceived, r.LastReceived.Sub(r.FirstReceived))
 
+	// calculate expected number of packets
+	r.ExpectedPacketsSent = uint(math.Ceil(float64(r.Duration.Milliseconds()) / float64(r.Interval.Milliseconds())))
+
 	// calculate packet loss percent
 	if r.SendDelayStats.N > 0 {
-		r.PacketLossPercent = 100 * float64(r.ExpectedPacketsSent-r.SendDelayStats.N) /
-			float64(r.ExpectedPacketsSent)
+		r.PacketLossPercent = 100.0 * float64(uint32(r.lastSeqno)+1-uint32(r.SendDelayStats.N)) /
+			float64(r.lastSeqno)
 	} else {
 		r.PacketLossPercent = float64(100)
 	}

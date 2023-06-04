@@ -21,7 +21,7 @@ func serverUsage() {
 	printf("               %%iface (all addresses on interface iface with default port %s)", DefaultPort)
 	printf("               %%iface:port (all addresses on interface iface with port)")
 	printf("               note: iface strings may contain * to match multiple interfaces")
-	printf("-o file        write JSON output to file (use '-' for stdout, 'd' for default filename)")
+	printf("-o file        write JSON output to file (use 'd' for default filename)")
 	printf("               if file has no extension, .json.gz is added, output is gzipped")
 	printf("               if extension is .json.gz, output is gzipped")
 	printf("               if extension is .gz, it's changed to .json.gz, output is gzipped")

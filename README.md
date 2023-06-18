@@ -1,4 +1,6 @@
-# IRTT (Isochronous Round-Trip Tester)
+# Network Latency Measurement Tool
+
+Based on [IRTT (Isochronous Round-Trip Tester)](https://github.com/heistp/irtt)
 
 IRTT measures round-trip time, one-way delay and other metrics using UDP
 packets sent on a fixed period, and produces both user and machine parseable

@@ -102,7 +102,7 @@ section of the irtt(1) man page.
 To install IRTT manually or build from source, you must:
 
 1. [Install Go](https://golang.org/dl/)
-2. Install irtt: `go get -u github.com/heistp/irtt/cmd/irtt`
+2. Install irtt: `go get -u github.com/samiemostafavi/irtt/cmd/irtt`
 3. For convenience, copy the `irtt` executable, which should be in
    `$HOME/go/bin`, or `$GOPATH/bin` if you have `$GOPATH` defined, to somewhere
    on your `PATH`.
@@ -128,7 +128,7 @@ If you want to build the source for development, you must also:
    which puts the resulting executable in `$GOPATH/bin`.
 
 If you want to build from a branch, you should first follow the steps above,
-then from the `github.com/heistp/irtt` directory, do:
+then from the `github.com/samiemostafavi/irtt` directory, do:
 1. `git checkout branch`
 2. `go get ./...`
 3. `go install ./cmd/irtt` or `./build.sh` and move resulting `irtt` executable

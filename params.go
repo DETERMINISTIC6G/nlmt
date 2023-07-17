@@ -28,6 +28,7 @@ type Params struct {
 	Duration        time.Duration `json:"duration"`
 	Interval        time.Duration `json:"interval"`
 	Length          int           `json:"length"`
+	Multiply        int           `json:"multiply"`
 	ReceivedStats   ReceivedStats `json:"received_stats"`
 	StampAt         StampAt       `json:"stamp_at"`
 	TripMode        TripMode      `json:"trip_mode"`

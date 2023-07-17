@@ -21,6 +21,7 @@ const (
 	DefaultReceivedStats           = ReceivedStatsBoth
 	DefaultStampAt                 = AtBoth
 	DefaultTripMode                = TMRound
+	DefaultMultiply                = 1
 	DefaultClock                   = BothClocks
 	DefaultDSCP                    = 0
 	DefaultLoose                   = false

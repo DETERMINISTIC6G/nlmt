@@ -24,6 +24,7 @@ type Client struct {
 // NewClient returns a new client.
 func NewClient(cfg *ClientConfig) *Client {
 	// create client
+	fmt.Println(cfg.Params.Multiply)
 	c := *cfg
 	c.Supplied = cfg
 	return &Client{
@@ -281,38 +282,48 @@ func (c *Client) send(ctx context.Context) error {
 		runtime.LockOSThread()
 	}
 
-	// include 0 timestamp in appropriate fields
-	seqno := Seqno(0)
-	p := c.conn.newPacket()
-	if c.conn.dscpSupport {
-		p.dscp = c.DSCP
-	}
-	p.addFields(fechoRequest, true)
-	p.zeroReceivedStats(c.ReceivedStats)
-	if c.TripMode == TMRound {
-		p.stampZeroes(c.StampAt, c.Clock)
-	} else {
-		mt := c.TimeSource.Now(c.Clock)
-		p.setTimestamp(AtSend, Timestamp{Time{}, mt})
-	}
-	p.setSeqno(seqno)
+	MULTIPLY := c.Multiply
+	var p []*packet
+	var seqno []Seqno
 
-	// set packet len and notify receive
-	c.Length = p.setLen(c.Length)
-	c.initCh <- true
+	for i := 0; i < MULTIPLY; i++ {
+		// include 0 timestamp in appropriate fields
+		seqno = append(seqno, Seqno(i))
+		p = append(p, c.conn.newPacket())
 
-	// fill the first packet, if necessary
-	if c.Filler != nil {
-		err := p.readPayload(c.Filler)
-		if err != nil {
-			return err
+		if c.conn.dscpSupport {
+			p[i].dscp = c.DSCP
 		}
-	} else {
-		p.zeroPayload()
+		p[i].addFields(fechoRequest, true)
+		p[i].zeroReceivedStats(c.ReceivedStats)
+		if c.TripMode == TMRound {
+			p[i].stampZeroes(c.StampAt, c.Clock)
+		} else {
+			mt := c.TimeSource.Now(c.Clock)
+			p[i].setTimestamp(AtSend, Timestamp{Time{}, mt})
+		}
+		p[i].setSeqno(seqno[i])
+
+		// set packet len
+		c.Length = p[i].setLen(c.Length)
+
+		// fill the first packet, if necessary
+		if c.Filler != nil {
+			err := p[i].readPayload(c.Filler)
+			if err != nil {
+				return err
+			}
+		} else {
+			p[i].zeroPayload()
+		}
+
+		// lastly, set the HMAC
+		p[i].updateHMAC()
+
 	}
 
-	// lastly, set the HMAC
-	p.updateHMAC()
+	// notify receive
+	c.initCh <- true
 
 	// record the start time of the test and calculate the end
 	t := c.TimeSource.Now(BothClocks)
@@ -321,40 +332,47 @@ func (c *Client) send(ctx context.Context) error {
 
 	// keep sending until the duration has passed
 	for {
-		// send to network and record times right before and after
-		tsend := c.rec.recordPreSend()
 		var err error
-		if clientDropsPercent == 0 || rand.Float32() > clientDropsPercent {
-			if c.TripMode == TMOneWay {
-				mt := c.TimeSource.Now(c.Clock)
-				p.setTimestamp(AtSend, Timestamp{Time{}, mt})
+
+		for j := 0; j < MULTIPLY; j++ {
+
+			// send to network and record times right before and after
+			tsend := c.rec.recordPreSend()
+
+			if clientDropsPercent == 0 || rand.Float32() > clientDropsPercent {
+				if c.TripMode == TMOneWay {
+					mt := c.TimeSource.Now(c.Clock)
+					p[j].setTimestamp(AtSend, Timestamp{Time{}, mt})
+				}
+				err = c.conn.send(p[j])
+			} else {
+				// simulate drop with an average send time
+				time.Sleep(20 * time.Microsecond)
 			}
-			err = c.conn.send(p)
-		} else {
-			// simulate drop with an average send time
-			time.Sleep(20 * time.Microsecond)
-		}
 
-		// return on error
-		if err != nil {
-			c.rec.removeLastStamps()
-			return err
-		}
-
-		// record send call
-		c.rec.recordPostSend(tsend, p.tsent, uint64(p.length()))
-
-		// prepare next packet (before sleep, so the next send time is as
-		// precise as possible)
-		seqno++
-		p.setSeqno(seqno)
-		if c.Filler != nil && !c.FillOne {
-			err := p.readPayload(c.Filler)
+			// return on error
 			if err != nil {
+				c.rec.removeLastStamps()
 				return err
 			}
+
+			// record send call
+			c.rec.recordPostSend(tsend, p[j].tsent, uint64(p[j].length()))
 		}
-		p.updateHMAC()
+
+		// prepare next packets (before sleep, so the next send time is as
+		// precise as possible)
+		for k := 0; k < MULTIPLY; k++ {
+			seqno[k] += Seqno(MULTIPLY)
+			p[k].setSeqno(seqno[k])
+			if c.Filler != nil && !c.FillOne {
+				err := p[k].readPayload(c.Filler)
+				if err != nil {
+					return err
+				}
+			}
+			p[k].updateHMAC()
+		}
 
 		// set the current base interval we're at
 		tnext := c.rec.Start.Add(c.Interval *
@@ -363,7 +381,7 @@ func (c *Client) send(ctx context.Context) error {
 		// if we're under half-way to the next interval, sleep until the next
 		// interval, but if we're over half-way, sleep until the interval after
 		// that
-		if p.tsent.Sub(c.rec.Start)%c.Interval < c.Interval/2 {
+		if p[MULTIPLY-1].tsent.Sub(c.rec.Start)%c.Interval < c.Interval/2 {
 			tnext = tnext.Add(c.Interval)
 		} else {
 			tnext = tnext.Add(2 * c.Interval)

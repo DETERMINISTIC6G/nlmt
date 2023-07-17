@@ -79,7 +79,7 @@ func (r *OneWayRecorder) recordReceive(p *packet, sts *Timestamp) bool {
 	seqno := p.seqno()
 
 	// make OneWayTripData
-	for len(r.OneWayTripData) < int(seqno)+1 {
+	for len(r.OneWayTripData) <= int(seqno)+1 {
 		r.OneWayTripData = append(r.OneWayTripData, OneWayTripData{})
 	}
 

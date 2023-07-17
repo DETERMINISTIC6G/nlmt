@@ -58,8 +58,6 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 	sc.restrictParams(params)
 	sc.params = params
 
-	fmt.Println(sc.params)
-
 	// set filler
 	if len(sc.params.ServerFill) > 0 &&
 		sc.params.ServerFill != DefaultServerFiller.String() {

@@ -61,10 +61,14 @@ func newOneWayResult(rec *OneWayRecorder, cfg *ServerConfig) *OneWayResult {
 	r.PacketsReceived = ReceivedCount(r.SendDelayStats.N + r.Duplicates)
 
 	// calculate send rate
-	r.ReceiveRate = calculateBitrate(r.BytesReceived, r.LastReceived.Sub(r.FirstReceived))
+	if r.PacketsReceived > 0 {
+		r.ReceiveRate = calculateBitrate(r.BytesReceived, r.LastReceived.Sub(r.FirstReceived))
+	}
 
 	// calculate expected number of packets
-	r.ExpectedPacketsSent = uint(math.Ceil(float64(r.Duration.Milliseconds()) / float64(r.Interval.Milliseconds())))
+	if r.PacketsReceived > 0 {
+		r.ExpectedPacketsSent = uint(math.Ceil(float64(r.Duration.Milliseconds()) / float64(r.Interval.Milliseconds())))
+	}
 
 	// calculate packet loss percent
 	if r.SendDelayStats.N > 0 {

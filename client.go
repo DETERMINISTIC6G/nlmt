@@ -24,7 +24,6 @@ type Client struct {
 // NewClient returns a new client.
 func NewClient(cfg *ClientConfig) *Client {
 	// create client
-	fmt.Println(cfg.Params.Multiply)
 	c := *cfg
 	c.Supplied = cfg
 	return &Client{

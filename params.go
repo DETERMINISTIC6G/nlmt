@@ -17,6 +17,7 @@ const (
 	pReceivedStats
 	pStampAt
 	pTripMode
+	pMultiply
 	pClock
 	pDSCP
 	pServerFill
@@ -80,6 +81,10 @@ func (p *Params) bytes() []byte {
 		pos += binary.PutUvarint(b[pos:], pTripMode)
 		pos += binary.PutVarint(b[pos:], int64(p.TripMode))
 	}
+	if p.Multiply != 0 {
+		pos += binary.PutUvarint(b[pos:], pMultiply)
+		pos += binary.PutVarint(b[pos:], int64(p.Multiply))
+	}
 	if p.Clock != 0 {
 		pos += binary.PutUvarint(b[pos:], pClock)
 		pos += binary.PutVarint(b[pos:], int64(p.Clock))
@@ -136,6 +141,8 @@ func (p *Params) readParam(b []byte) (pos int, err error) {
 			p.StampAt, err = StampAtFromInt(int(v))
 		case pTripMode:
 			p.TripMode, err = TripModeFromInt(int(v))
+		case pMultiply:
+			p.Multiply = int(v)
 		case pClock:
 			p.Clock, err = ClockFromInt(int(v))
 		case pDSCP:

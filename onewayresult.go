@@ -73,7 +73,7 @@ func newOneWayResult(rec *OneWayRecorder, cfg *ServerConfig) *OneWayResult {
 	// calculate packet loss percent
 	if r.SendDelayStats.N > 0 {
 		r.PacketLossPercent = 100.0 * float64(uint32(r.lastSeqno)+1-uint32(r.SendDelayStats.N)) /
-			float64(r.lastSeqno)
+			(float64(r.lastSeqno) + 1)
 	} else {
 		r.PacketLossPercent = float64(100)
 	}

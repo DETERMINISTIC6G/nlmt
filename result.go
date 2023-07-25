@@ -3,6 +3,7 @@ package nlmt
 import (
 	"encoding/json"
 	"math"
+	"net"
 	"sort"
 	"time"
 )
@@ -15,10 +16,11 @@ type Result struct {
 	SendErr     error         `json:"send_err,omitempty"`
 	ReceiveErr  error         `json:"receive_err,omitempty"`
 	*Stats      `json:"stats"`
-	RoundTrips  []RoundTrip `json:"round_trips"`
+	RoundTrips  []RoundTrip  `json:"round_trips"`
+	NetAddr     *net.UDPAddr `json:"udp_addr"`
 }
 
-func newResult(rec *Recorder, cfg *ClientConfig, serr error, rerr error) *Result {
+func newResult(rec *Recorder, cfg *ClientConfig, naddr *net.UDPAddr, serr error, rerr error) *Result {
 	stats := &Stats{Recorder: rec}
 	r := &Result{
 		VersionInfo: NewVersionInfo(),
@@ -27,6 +29,7 @@ func newResult(rec *Recorder, cfg *ClientConfig, serr error, rerr error) *Result
 		SendErr:     serr,
 		ReceiveErr:  rerr,
 		Stats:       stats,
+		NetAddr:     naddr,
 	}
 
 	// calculate total duration (monotonic time since start)
@@ -135,7 +138,11 @@ func newResult(rec *Recorder, cfg *ClientConfig, serr error, rerr error) *Result
 	r.SendRate = calculateBitrate(r.BytesSent, r.LastSent.Sub(r.FirstSend))
 
 	// calculate receive rate (start from time of first receipt)
-	r.ReceiveRate = calculateBitrate(r.BytesReceived, r.LastReceived.Sub(r.FirstReceived))
+	if r.BytesReceived > 0 {
+		r.ReceiveRate = calculateBitrate(r.BytesReceived, r.LastReceived.Sub(r.FirstReceived))
+	} else {
+		r.ReceiveRate = Bitrate(0)
+	}
 
 	// calculate packet loss percent
 	if r.RTTStats.N > 0 {

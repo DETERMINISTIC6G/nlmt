@@ -106,13 +106,15 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 	return
 }
 
-func replaceXWithIPPortDateTime(addr *net.UDPAddr, format string) string {
-	ip := strings.Replace(addr.IP.String(), ".", "-", -1)
+func replaceXWithIPPortDateTime(addr *net.UDPAddr, format string, at string) string {
+	ip := strings.Replace(addr.IP.String(), ".", "", -1)
 	port := fmt.Sprintf("%d", addr.Port)
 	now := time.Now()
 
 	replacements := map[string]string{
-		"x": ip + "-" + port,
+		"q": at,
+		"x": ip + "_" + port,
+		"y": fmt.Sprintf("%d", now.Year()),
 		"m": fmt.Sprintf("%d", now.Month()),
 		"d": fmt.Sprintf("%d", now.Day()),
 		"h": fmt.Sprintf("%d", now.Hour()),
@@ -148,7 +150,7 @@ func (sc *sconn) serve(p *packet) (closed bool, err error) {
 			if sc.listener.ServerConfig.OutputJSON {
 				var fileAddr string
 				if sc.listener.ServerConfig.OutputJSONAddr == "" {
-					fileAddr = replaceXWithIPPortDateTime(sc.raddr, DefaultJSONAddrFormat)
+					fileAddr = replaceXWithIPPortDateTime(sc.raddr, DefaultJSONAddrFormat, "se")
 				} else {
 					fileAddr = sc.listener.ServerConfig.OutputJSONAddr
 				}

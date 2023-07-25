@@ -63,8 +63,8 @@ var DefaultTimeSource = NewDefaultTimeSource()
 var DefaultOutputJSON = false
 var DefaultOutputJSONAddr = ""
 
-// x is the ip and port, d: dat, h: hour, t: minute, w:second
-var DefaultJSONAddrFormat = "x_m-d-h-t-w.json.gz"
+// q is the type (client or server) x is the ip and port, y: year, m: month, d: day, h: hour, t: minute, w:second
+var DefaultJSONAddrFormat = "q_x_ymd_htw.json.gz"
 
 // DefaultFillPattern is the default fill pattern.
 var DefaultFillPattern = []byte("irtt")

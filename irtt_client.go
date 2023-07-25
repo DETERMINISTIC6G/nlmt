@@ -30,7 +30,7 @@ func clientUsage() {
 	printf("               increased as necessary for irtt headers, common values:")
 	printf("               1472 (max unfragmented size of IPv4 datagram for 1500 byte MTU)")
 	printf("               1452 (max unfragmented size of IPv6 datagram for 1500 byte MTU)")
-	printf("-o file        write JSON output to file (use '-' for stdout)")
+	printf("-o file        write JSON output to file (use '-' for stdout, use 'd' for default filename)")
 	printf("               if file has no extension, .json.gz is added, output is gzipped")
 	printf("               if extension is .json.gz, output is gzipped")
 	printf("               if extension is .gz, it's changed to .json.gz, output is gzipped")
@@ -342,12 +342,15 @@ func runClientCLI(args []string) {
 	}
 
 	// print results
-	if !*reallyQuiet && (tm == TMRound) {
+	if !*reallyQuiet {
 		printResult(r)
 	}
 
-	// write results to JSON
-	if (*outputStr != "") && (tm == TMRound) {
+	if *outputStr == "d" {
+		*outputStr = replaceXWithIPPortDateTime(r.NetAddr, DefaultJSONAddrFormat, "cl")
+	}
+
+	if *outputStr != "" {
 		if err := writeResultJSON(r, *outputStr, ctx.Err() != nil); err != nil {
 			exitOnError(err, exitCodeRuntimeError)
 		}

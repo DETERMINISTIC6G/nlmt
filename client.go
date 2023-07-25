@@ -138,9 +138,8 @@ func (c *Client) Run(ctx context.Context) (r *Result, err error) {
 	// wait for send and receive to complete
 	wg.Wait()
 
-	if c.ClientConfig.TripMode == TMRound {
-		r = newResult(c.rec, c.ClientConfig, serr, rerr)
-	}
+	r = newResult(c.rec, c.ClientConfig, c.conn.localAddr(), serr, rerr)
+
 	return
 }
 

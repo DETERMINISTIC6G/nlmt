@@ -347,7 +347,12 @@ func runClientCLI(args []string) {
 	}
 
 	if *outputStr == "d" {
-		*outputStr = replaceXWithIPPortDateTime(r.NetAddr, DefaultJSONAddrFormat, "cl")
+		if cfg.TripMode == TMRound {
+			*outputStr = replaceXWithIPPortDateTime(r.NetAddr, DefaultJSONAddrFormat, "rt")
+		} else {
+			*outputStr = replaceXWithIPPortDateTime(r.NetAddr, DefaultJSONAddrFormat, "cl")
+		}
+
 	}
 
 	if *outputStr != "" {

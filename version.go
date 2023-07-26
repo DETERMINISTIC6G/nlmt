@@ -1,7 +1,7 @@
 package nlmt
 
 // Version is the IRTT version number (replaced during build).
-var Version = "0.9.10"
+var Version = "0.9.11"
 
 // ProtocolVersion is the protocol version number, which must match between client
 // and server.

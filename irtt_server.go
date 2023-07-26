@@ -186,7 +186,7 @@ func runServerCLI(args []string) {
 		_, err = os.Stat(*outputDirStr)
 		if os.IsNotExist(err) {
 			// Directory does not exist, so create it
-			err := os.Mkdir(*outputDirStr, 0755) // 0755 is the default permission for the directory
+			err := os.MkdirAll(*outputDirStr, os.ModePerm)
 			if err != nil {
 				fmt.Println("Error creating output directory:", err)
 				return

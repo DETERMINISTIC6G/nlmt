@@ -1,6 +1,7 @@
 package nlmt
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -27,6 +28,8 @@ func serverUsage() {
 	printf("               if extension is .gz, it's changed to .json.gz, output is gzipped")
 	printf("               if extension is .json, output is not gzipped")
 	printf("               output to stdout is not gzipped, pipe to gzip if needed")
+	printf("--outdir=dir   output files directory folder (default %s)", DefaultOutputDir)
+	printf("               only applies if default file name is used.")
 	printf("-q             quiet, suppress per-packet output")
 	printf("-Q             really quiet, suppress all output except errors to stderr")
 	printf("-d duration    max test duration, or 0 for no maximum")
@@ -112,6 +115,7 @@ func runServerCLI(args []string) {
 	var lockOSThread = fs.Bool("thread", DefaultThreadLock, "thread")
 	var version = fs.BoolP("version", "v", false, "version")
 	var outputStr = fs.StringP("o", "o", "", "output file")
+	var outputDirStr = fs.String("outdir", DefaultOutputDir, "output directory")
 	var quiet = fs.BoolP("q", "q", defaultQuiet, "quiet")
 	var reallyQuiet = fs.BoolP("Q", "Q", defaultReallyQuiet, "really quiet")
 	fs.Parse(args)
@@ -178,6 +182,23 @@ func runServerCLI(args []string) {
 	if *outputStr == "" {
 		cfg.OutputJSON = false
 	} else if *outputStr == "d" {
+		// check output directory, create it if it does not exist
+		_, err = os.Stat(*outputDirStr)
+		if os.IsNotExist(err) {
+			// Directory does not exist, so create it
+			err := os.Mkdir(*outputDirStr, 0755) // 0755 is the default permission for the directory
+			if err != nil {
+				fmt.Println("Error creating output directory:", err)
+				return
+			}
+			fmt.Println("Output directory created successfully!")
+		} else if err != nil {
+			fmt.Println("Error checking output directory:", err)
+			return
+		} else {
+			fmt.Println("Output directory already exists.")
+		}
+		cfg.OutputDir = *outputDirStr
 		cfg.OutputJSON = true
 	} else {
 		cfg.OutputJSON = true

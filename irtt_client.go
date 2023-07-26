@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	"path"
 	"strconv"
 	"strings"
 	"syscall"
@@ -36,6 +37,8 @@ func clientUsage() {
 	printf("               if extension is .gz, it's changed to .json.gz, output is gzipped")
 	printf("               if extension is .json, output is not gzipped")
 	printf("               output to stdout is not gzipped, pipe to gzip if needed")
+	printf("--outdir=dir   output files directory folder (default %s)", DefaultOutputDir)
+	printf("               only applies if default file name is used.")
 	printf("-q             quiet, suppress per-packet output")
 	printf("-Q             really quiet, suppress all output except errors to stderr")
 	printf("-n             no test, connect to the server and validate test parameters")
@@ -166,6 +169,7 @@ func runClientCLI(args []string) {
 	var multiply = fs.IntP("m", "m", DefaultMultiply, "multiply packets")
 	var clockStr = fs.String("clock", DefaultClock.String(), "clock")
 	var outputStr = fs.StringP("o", "o", "", "output file")
+	var outputDirStr = fs.String("outdir", DefaultOutputDir, "output directory")
 	var quiet = fs.BoolP("q", "q", defaultQuiet, "quiet")
 	var reallyQuiet = fs.BoolP("Q", "Q", defaultReallyQuiet, "really quiet")
 	var dscpStr = fs.String("dscp", strconv.Itoa(DefaultDSCP), "dscp value")
@@ -347,12 +351,30 @@ func runClientCLI(args []string) {
 	}
 
 	if *outputStr == "d" {
-		if cfg.TripMode == TMRound {
-			*outputStr = replaceXWithIPPortDateTime(r.NetAddr, DefaultJSONAddrFormat, "rt")
+		// check output directory, create it if it does not exist
+		_, err := os.Stat(*outputDirStr)
+		if os.IsNotExist(err) {
+			// Directory does not exist, so create it
+			err := os.Mkdir(*outputDirStr, 0755) // 0755 is the default permission for the directory
+			if err != nil {
+				fmt.Println("Error creating output directory:", err)
+				return
+			}
+			fmt.Println("Output directory created successfully!")
+		} else if err != nil {
+			fmt.Println("Error checking output directory:", err)
+			return
 		} else {
-			*outputStr = replaceXWithIPPortDateTime(r.NetAddr, DefaultJSONAddrFormat, "cl")
+			fmt.Println("Output directory already exists.")
 		}
 
+		// create file address
+		// Combine directory and filename to form a complete file address
+		if cfg.TripMode == TMRound {
+			*outputStr = path.Join(*outputDirStr, replaceXWithIPPortDateTime(r.NetAddr, DefaultJSONAddrFormat, "rt"))
+		} else {
+			*outputStr = path.Join(*outputDirStr, replaceXWithIPPortDateTime(r.NetAddr, DefaultJSONAddrFormat, "cl"))
+		}
 	}
 
 	if *outputStr != "" {

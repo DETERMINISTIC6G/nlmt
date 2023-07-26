@@ -11,6 +11,7 @@ const (
 	DefaultPortInt    = 2112
 	DefaultTTL        = 0
 	DefaultThreadLock = false
+	DefaultOutputDir  = "."
 )
 
 // Client defaults.

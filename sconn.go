@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"path"
 	"strings"
 	"text/tabwriter"
 	"time"
@@ -151,7 +152,9 @@ func (sc *sconn) serve(p *packet) (closed bool, err error) {
 			if sc.listener.ServerConfig.OutputJSON {
 				var fileAddr string
 				if sc.listener.ServerConfig.OutputJSONAddr == "" {
-					fileAddr = replaceXWithIPPortDateTime(sc.raddr, DefaultJSONAddrFormat, "se")
+					// create file address
+					// combine directory and filename to form a complete file address
+					fileAddr = path.Join(sc.OutputDir, replaceXWithIPPortDateTime(sc.raddr, DefaultJSONAddrFormat, "se"))
 				} else {
 					fileAddr = sc.listener.ServerConfig.OutputJSONAddr
 				}

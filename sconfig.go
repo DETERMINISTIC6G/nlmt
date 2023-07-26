@@ -25,6 +25,7 @@ type ServerConfig struct {
 	ReallyQuiet    bool
 	OutputJSON     bool
 	OutputJSONAddr string
+	OutputDir      string
 }
 
 // NewServerConfig returns a new ServerConfig with the default settings.
@@ -49,5 +50,6 @@ func NewServerConfig() *ServerConfig {
 		ReallyQuiet:    defaultReallyQuiet,
 		OutputJSON:     DefaultOutputJSON,
 		OutputJSONAddr: DefaultOutputJSONAddr,
+		OutputDir:      DefaultOutputDir,
 	}
 }

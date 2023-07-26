@@ -107,19 +107,20 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 }
 
 func replaceXWithIPPortDateTime(addr *net.UDPAddr, format string, at string) string {
-	ip := strings.Replace(addr.IP.String(), ".", "", -1)
+
+	ip := strings.Replace(addr.IP.String(), ".", "-", -1)
 	port := fmt.Sprintf("%d", addr.Port)
 	now := time.Now()
 
 	replacements := map[string]string{
 		"q": at,
 		"x": ip + "_" + port,
-		"y": fmt.Sprintf("%d", now.Year()),
-		"m": fmt.Sprintf("%d", now.Month()),
-		"d": fmt.Sprintf("%d", now.Day()),
-		"h": fmt.Sprintf("%d", now.Hour()),
-		"t": fmt.Sprintf("%d", now.Minute()),
-		"w": fmt.Sprintf("%d", now.Second()),
+		"y": fmt.Sprintf("%04d", now.Year()),
+		"m": fmt.Sprintf("%02d", now.Month()),
+		"d": fmt.Sprintf("%02d", now.Day()),
+		"h": fmt.Sprintf("%02d", now.Hour()),
+		"t": fmt.Sprintf("%02d", now.Minute()),
+		"w": fmt.Sprintf("%02d", now.Second()),
 	}
 
 	for k, v := range replacements {

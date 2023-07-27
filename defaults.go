@@ -138,7 +138,7 @@ const sconnsInitSize = 32
 const maxServerFillLen = 32
 
 // length of group string
-const maxGroupLen = 8
+const maxGroupLen = 24
 
 // minRestrictedInterval is the minimum restricted interval that the client will
 // accept from the server.

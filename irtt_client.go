@@ -39,7 +39,7 @@ func clientUsage() {
 	printf("               output to stdout is not gzipped, pipe to gzip if needed")
 	printf("--outdir=dir   output files directory folder (default %s)", DefaultOutputDir)
 	printf("               only applies if default file name is used.")
-	printf("-g group       maximum %d chars group name, to group measurements at server side (default %s)", maxGroupLen, DefaultGroup)
+	printf("-g group       maximum %d chars group name, to group measurements at server side (default: %s)", maxGroupLen, DefaultGroup)
 	printf("               only applies if default file name is used.")
 	printf("-q             quiet, suppress per-packet output")
 	printf("-Q             really quiet, suppress all output except errors to stderr")
@@ -273,7 +273,7 @@ func runClientCLI(args []string) {
 	// parse group string
 	group, err := ParseGroup(*groupStr)
 	if err != nil {
-		exitOnError(fmt.Errorf("%s (group must be less than %d alphanumeric characters only)", maxGroupLen, err),
+		exitOnError(fmt.Errorf("%s", err),
 			exitCodeBadCommandLine)
 	}
 

@@ -39,6 +39,8 @@ func clientUsage() {
 	printf("               output to stdout is not gzipped, pipe to gzip if needed")
 	printf("--outdir=dir   output files directory folder (default %s)", DefaultOutputDir)
 	printf("               only applies if default file name is used.")
+	printf("-g group       maximum %d chars group name, to group measurements at server side (default %s)", maxGroupLen, DefaultGroup)
+	printf("               only applies if default file name is used.")
 	printf("-q             quiet, suppress per-packet output")
 	printf("-Q             really quiet, suppress all output except errors to stderr")
 	printf("-n             no test, connect to the server and validate test parameters")
@@ -170,6 +172,7 @@ func runClientCLI(args []string) {
 	var clockStr = fs.String("clock", DefaultClock.String(), "clock")
 	var outputStr = fs.StringP("o", "o", "", "output file")
 	var outputDirStr = fs.String("outdir", DefaultOutputDir, "output directory")
+	var groupStr = fs.StringP("g", "g", "", "group name")
 	var quiet = fs.BoolP("q", "q", defaultQuiet, "quiet")
 	var reallyQuiet = fs.BoolP("Q", "Q", defaultReallyQuiet, "really quiet")
 	var dscpStr = fs.String("dscp", strconv.Itoa(DefaultDSCP), "dscp value")
@@ -267,6 +270,13 @@ func runClientCLI(args []string) {
 			exitCodeBadCommandLine)
 	}
 
+	// parse group string
+	group, err := ParseGroup(*groupStr)
+	if err != nil {
+		exitOnError(fmt.Errorf("%s (group must be less than %d alphanumeric characters only)", maxGroupLen, err),
+			exitCodeBadCommandLine)
+	}
+
 	// parse HMAC key
 	var hmacKey []byte
 	if *hmacStr != "" {
@@ -319,6 +329,7 @@ func runClientCLI(args []string) {
 	cfg.TripMode = tm
 	cfg.Multiply = *multiply
 	cfg.Clock = clock
+	cfg.Group = group
 	cfg.DSCP = int(dscp)
 	cfg.ServerFill = *sfillStr
 	cfg.Loose = *loose

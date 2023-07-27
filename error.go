@@ -59,6 +59,7 @@ const (
 	InvalidWaitString
 	InvalidWaitFactor
 	InvalidWaitDuration
+	InvalidGroupStr
 	NoSuchAverager
 	NoSuchFiller
 	NoSuchTimer

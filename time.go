@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -35,6 +36,22 @@ func ParseDurations(sdurs string) (durs Durations, err error) {
 		}
 	}
 	return durs, nil
+}
+
+func ParseGroup(input string) (output string, err error) {
+	// Check if the input is exactly 3 characters long
+	if len(input) > maxGroupLen {
+		return "", Errorf(InvalidGroupStr, "group len greater than %d characters: %s", maxGroupLen, input)
+	}
+
+	// Define a regular expression pattern to match alphanumeric characters
+	isAlphanumeric := regexp.MustCompile("^[A-Za-z0-9]+$")
+	if isAlphanumeric.MatchString(input) {
+		output = input
+		return output, nil
+	} else {
+		return "", Errorf(InvalidGroupStr, "group not alphanumeric str: %s", input)
+	}
 }
 
 // Time contains both wall clock (subject to system time adjustments) and

@@ -82,7 +82,7 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 		l.eventf(OpenClose, p.raddr, "open-close connection")
 	} else {
 		l.cmgr.put(sc)
-		l.eventf(NewConn, p.raddr, "new connection, token=%016x, trip-mode=%s", sc.ctoken, sc.params.TripMode)
+		l.eventf(NewConn, p.raddr, "new connection, token=%016x, group=%s, trip-mode=%s", sc.ctoken, sc.params.Group, sc.params.TripMode)
 	}
 
 	// add recorder handler
@@ -153,8 +153,22 @@ func (sc *sconn) serve(p *packet) (closed bool, err error) {
 				var fileAddr string
 				if sc.listener.ServerConfig.OutputJSONAddr == "" {
 					// create file address
+					// combine output directory setting and group name to form outputdir
+					outputDirStr := path.Join(sc.OutputDir, sc.params.Group, "server")
+
+					// check output directory, create it if it does not exist
+					_, errs := os.Stat(outputDirStr)
+					if os.IsNotExist(errs) {
+						// Directory does not exist, so create it
+						err := os.MkdirAll(outputDirStr, os.ModePerm)
+						if err != nil {
+							fmt.Println("Error creating output directory:", err)
+						}
+					}
+
 					// combine directory and filename to form a complete file address
-					fileAddr = path.Join(sc.OutputDir, replaceXWithIPPortDateTime(sc.raddr, DefaultJSONAddrFormat, "se"))
+					fileAddr = path.Join(outputDirStr, replaceXWithIPPortDateTime(sc.raddr, DefaultJSONAddrFormat, "se"))
+
 				} else {
 					fileAddr = sc.listener.ServerConfig.OutputJSONAddr
 				}

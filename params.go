@@ -18,6 +18,7 @@ const (
 	pStampAt
 	pTripMode
 	pMultiply
+	pGroup
 	pClock
 	pDSCP
 	pServerFill
@@ -33,6 +34,7 @@ type Params struct {
 	ReceivedStats   ReceivedStats `json:"received_stats"`
 	StampAt         StampAt       `json:"stamp_at"`
 	TripMode        TripMode      `json:"trip_mode"`
+	Group           string        `json:"group"`
 	Clock           Clock         `json:"clock"`
 	DSCP            int           `json:"dscp"`
 	ServerFill      string        `json:"server_fill"`
@@ -85,6 +87,10 @@ func (p *Params) bytes() []byte {
 		pos += binary.PutUvarint(b[pos:], pMultiply)
 		pos += binary.PutVarint(b[pos:], int64(p.Multiply))
 	}
+	if len(p.Group) > 0 {
+		pos += binary.PutUvarint(b[pos:], pGroup)
+		pos += putString(b[pos:], p.Group, maxGroupLen)
+	}
 	if p.Clock != 0 {
 		pos += binary.PutUvarint(b[pos:], pClock)
 		pos += binary.PutVarint(b[pos:], int64(p.Clock))
@@ -111,6 +117,11 @@ func (p *Params) readParam(b []byte) (pos int, err error) {
 
 	if t == pServerFill {
 		p.ServerFill, n, err = readString(b[pos:], maxServerFillLen)
+		if err != nil {
+			return
+		}
+	} else if t == pGroup {
+		p.Group, n, err = readString(b[pos:], maxGroupLen)
 		if err != nil {
 			return
 		}

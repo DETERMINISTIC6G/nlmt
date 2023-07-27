@@ -40,6 +40,7 @@ func NewClientConfig() *ClientConfig {
 			Interval:        DefaultInterval,
 			Length:          DefaultLength,
 			Multiply:        DefaultMultiply,
+			Group:           DefaultGroup,
 			StampAt:         DefaultStampAt,
 			TripMode:        DefaultTripMode,
 			Clock:           DefaultClock,

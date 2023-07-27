@@ -57,22 +57,23 @@ func _() {
 	_ = x[InvalidWaitString - -2060]
 	_ = x[InvalidWaitFactor - -2061]
 	_ = x[InvalidWaitDuration - -2062]
-	_ = x[NoSuchAverager - -2063]
-	_ = x[NoSuchFiller - -2064]
-	_ = x[NoSuchTimer - -2065]
-	_ = x[NoSuchTimeSource - -2066]
-	_ = x[NoSuchWaiter - -2067]
-	_ = x[IntervalNonPositive - -2068]
-	_ = x[DurationNonPositive - -2069]
-	_ = x[ConnTokenZero - -2070]
-	_ = x[ServerClosed - -2071]
-	_ = x[OpenTimeout - -2072]
-	_ = x[InvalidServerRestriction - -2073]
-	_ = x[InvalidReceivedStatsInt - -2074]
-	_ = x[InvalidReceivedStatsString - -2075]
-	_ = x[OpenTimeoutTooShort - -2076]
-	_ = x[ServerFillTooLong - -2077]
-	_ = x[UnexpectedInitChannelClose - -2078]
+	_ = x[InvalidGroupStr - -2063]
+	_ = x[NoSuchAverager - -2064]
+	_ = x[NoSuchFiller - -2065]
+	_ = x[NoSuchTimer - -2066]
+	_ = x[NoSuchTimeSource - -2067]
+	_ = x[NoSuchWaiter - -2068]
+	_ = x[IntervalNonPositive - -2069]
+	_ = x[DurationNonPositive - -2070]
+	_ = x[ConnTokenZero - -2071]
+	_ = x[ServerClosed - -2072]
+	_ = x[OpenTimeout - -2073]
+	_ = x[InvalidServerRestriction - -2074]
+	_ = x[InvalidReceivedStatsInt - -2075]
+	_ = x[InvalidReceivedStatsString - -2076]
+	_ = x[OpenTimeoutTooShort - -2077]
+	_ = x[ServerFillTooLong - -2078]
+	_ = x[UnexpectedInitChannelClose - -2079]
 	_ = x[MultipleAddresses-1024]
 	_ = x[ServerStart-1025]
 	_ = x[ServerStop-1026]
@@ -97,7 +98,7 @@ func _() {
 }
 
 const (
-	_Code_name_0 = "UnexpectedInitChannelCloseServerFillTooLongOpenTimeoutTooShortInvalidReceivedStatsStringInvalidReceivedStatsIntInvalidServerRestrictionOpenTimeoutServerClosedConnTokenZeroDurationNonPositiveIntervalNonPositiveNoSuchWaiterNoSuchTimeSourceNoSuchTimerNoSuchFillerNoSuchAveragerInvalidWaitDurationInvalidWaitFactorInvalidWaitStringInvalidSleepFactorUnexpectedSequenceNumberClockMismatchStampAtMismatchShortReplyExpectedReplyFlagTTLErrorDFErrorUnexpectedOpenFlagAllocateResultsPanicInvalidExpAvgAlphaInvalidWinAvgWindow"
+	_Code_name_0 = "UnexpectedInitChannelCloseServerFillTooLongOpenTimeoutTooShortInvalidReceivedStatsStringInvalidReceivedStatsIntInvalidServerRestrictionOpenTimeoutServerClosedConnTokenZeroDurationNonPositiveIntervalNonPositiveNoSuchWaiterNoSuchTimeSourceNoSuchTimerNoSuchFillerNoSuchAveragerInvalidGroupStrInvalidWaitDurationInvalidWaitFactorInvalidWaitStringInvalidSleepFactorUnexpectedSequenceNumberClockMismatchStampAtMismatchShortReplyExpectedReplyFlagTTLErrorDFErrorUnexpectedOpenFlagAllocateResultsPanicInvalidExpAvgAlphaInvalidWinAvgWindow"
 	_Code_name_1 = "InvalidSyslogURISyslogNotSupportedAddressMismatchLargeRequestShortIntervalInvalidConnTokenNoSuitableAddressFoundUnexpectedReplyFlagUnspecifiedWithSpecifiedAddressesNoMatchingInterfacesUpNoMatchingInterfaces"
 	_Code_name_2 = "ProtocolVersionMismatchInvalidParamValueParamOverflowShortParamBufferInvalidFlagBitsSetDFNotSupportedInconsistentClocksNonexclusiveMidpointTStampUnexpectedHMACBadHMACNoHMACBadMagicInvalidClockIntInvalidClockStringInvalidAllowStampStringInvalidTripModeIntInvalidTripModeStringInvalidStampAtIntInvalidStampAtStringFieldsCapacityTooLargeFieldsLengthTooLargeInvalidDFStringShortWrite"
 	_Code_name_3 = "MultipleAddressesServerStartServerStopListenerStartListenerStopListenerErrorDropNewConnOpenCloseCloseConnNoDSCPSupportExceededDurationNoReceiveDstAddrSupportRemoveNoConnInvalidServerFill"
@@ -105,7 +106,7 @@ const (
 )
 
 var (
-	_Code_index_0 = [...]uint16{0, 26, 43, 62, 88, 111, 135, 146, 158, 171, 190, 209, 221, 237, 248, 260, 274, 293, 310, 327, 345, 369, 382, 397, 407, 424, 432, 439, 457, 477, 495, 514}
+	_Code_index_0 = [...]uint16{0, 26, 43, 62, 88, 111, 135, 146, 158, 171, 190, 209, 221, 237, 248, 260, 274, 289, 308, 325, 342, 360, 384, 397, 412, 422, 439, 447, 454, 472, 492, 510, 529}
 	_Code_index_1 = [...]uint8{0, 16, 34, 49, 61, 74, 90, 112, 131, 164, 186, 206}
 	_Code_index_2 = [...]uint16{0, 23, 40, 53, 69, 87, 101, 119, 145, 159, 166, 172, 180, 195, 213, 236, 254, 275, 292, 312, 334, 354, 369, 379}
 	_Code_index_3 = [...]uint8{0, 17, 28, 38, 51, 63, 76, 80, 87, 96, 105, 118, 134, 157, 169, 186}
@@ -114,8 +115,8 @@ var (
 
 func (i Code) String() string {
 	switch {
-	case -2078 <= i && i <= -2048:
-		i -= -2078
+	case -2079 <= i && i <= -2048:
+		i -= -2079
 		return _Code_name_0[_Code_index_0[i]:_Code_index_0[i+1]]
 	case -1034 <= i && i <= -1024:
 		i -= -1034

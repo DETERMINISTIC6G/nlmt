@@ -1,7 +1,6 @@
 package nlmt
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -182,22 +181,6 @@ func runServerCLI(args []string) {
 	if *outputStr == "" {
 		cfg.OutputJSON = false
 	} else if *outputStr == "d" {
-		// check output directory, create it if it does not exist
-		_, err = os.Stat(*outputDirStr)
-		if os.IsNotExist(err) {
-			// Directory does not exist, so create it
-			err := os.MkdirAll(*outputDirStr, os.ModePerm)
-			if err != nil {
-				fmt.Println("Error creating output directory:", err)
-				return
-			}
-			fmt.Println("Output directory created successfully!")
-		} else if err != nil {
-			fmt.Println("Error checking output directory:", err)
-			return
-		} else {
-			fmt.Println("Output directory already exists.")
-		}
 		cfg.OutputDir = *outputDirStr
 		cfg.OutputJSON = true
 	} else {

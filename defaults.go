@@ -12,6 +12,7 @@ const (
 	DefaultTTL        = 0
 	DefaultThreadLock = false
 	DefaultOutputDir  = "."
+	DefaultGroup      = "default"
 )
 
 // Client defaults.
@@ -135,6 +136,9 @@ const sconnsInitSize = 32
 
 // maximum length of server fill string
 const maxServerFillLen = 32
+
+// length of group string
+const maxGroupLen = 8
 
 // minRestrictedInterval is the minimum restricted interval that the client will
 // accept from the server.

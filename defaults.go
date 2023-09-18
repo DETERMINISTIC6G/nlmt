@@ -19,6 +19,8 @@ const (
 const (
 	DefaultDuration                = 1 * time.Minute
 	DefaultInterval                = 1 * time.Second
+	DefaultIntervalOffset          = -1 * time.Second
+	MinWaitingTime                 = 5 * time.Millisecond
 	DefaultLength                  = 0
 	DefaultReceivedStats           = ReceivedStatsBoth
 	DefaultStampAt                 = AtBoth

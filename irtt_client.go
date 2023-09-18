@@ -27,6 +27,7 @@ func clientUsage() {
 	printf("")
 	printf("-d duration    total time to send (default %s, see Duration units below)", DefaultDuration)
 	printf("-i interval    send interval (default %s, see Duration units below)", DefaultInterval)
+	printf("-f offset      forces a send interval offset (default random, see Duration units below)")
 	printf("-l length      length of packet (including irtt headers, default %d)", DefaultLength)
 	printf("               increased as necessary for irtt headers, common values:")
 	printf("               1472 (max unfragmented size of IPv4 datagram for 1500 byte MTU)")
@@ -163,6 +164,7 @@ func runClientCLI(args []string) {
 	}
 	var durationStr = fs.StringP("d", "d", DefaultDuration.String(), "total time to send")
 	var intervalStr = fs.StringP("i", "i", DefaultInterval.String(), "send interval")
+	var intervalOffsetStr = fs.StringP("f", "f", DefaultIntervalOffset.String(), "send interval offset")
 	var length = fs.IntP("l", "l", DefaultLength, "packet length")
 	var noTest = fs.BoolP("n", "n", false, "no test")
 	var rsStr = fs.String("stats", DefaultReceivedStats.String(), "received stats")
@@ -215,6 +217,13 @@ func runClientCLI(args []string) {
 
 	// parse interval
 	interval, err := time.ParseDuration(*intervalStr)
+	if err != nil {
+		exitOnError(fmt.Errorf("%s (use s for seconds)", err),
+			exitCodeBadCommandLine)
+	}
+
+	// parse interval offset
+	intervalOffset, err := time.ParseDuration(*intervalOffsetStr)
 	if err != nil {
 		exitOnError(fmt.Errorf("%s (use s for seconds)", err),
 			exitCodeBadCommandLine)
@@ -343,6 +352,7 @@ func runClientCLI(args []string) {
 	cfg.HMACKey = hmacKey
 	cfg.Handler = &clientHandler{*quiet, *reallyQuiet}
 	cfg.ThreadLock = *threadLock
+	cfg.IntervalOffset = intervalOffset
 
 	// run test
 	c := NewClient(cfg)

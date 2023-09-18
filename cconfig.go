@@ -38,6 +38,7 @@ func NewClientConfig() *ClientConfig {
 			ProtocolVersion: ProtocolVersion,
 			Duration:        DefaultDuration,
 			Interval:        DefaultInterval,
+			IntervalOffset:  DefaultIntervalOffset,
 			Length:          DefaultLength,
 			Multiply:        DefaultMultiply,
 			Group:           DefaultGroup,

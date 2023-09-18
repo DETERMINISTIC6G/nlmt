@@ -13,6 +13,7 @@ const (
 	pProtocolVersion = iota + 1
 	pDuration
 	pInterval
+	pIntervalOffset
 	pLength
 	pReceivedStats
 	pStampAt
@@ -29,6 +30,7 @@ type Params struct {
 	ProtocolVersion int           `json:"proto_version"`
 	Duration        time.Duration `json:"duration"`
 	Interval        time.Duration `json:"interval"`
+	IntervalOffset  time.Duration `json:"interval_offset"`
 	Length          int           `json:"length"`
 	Multiply        int           `json:"multiply"`
 	ReceivedStats   ReceivedStats `json:"received_stats"`
@@ -66,6 +68,10 @@ func (p *Params) bytes() []byte {
 	if p.Interval != 0 {
 		pos += binary.PutUvarint(b[pos:], pInterval)
 		pos += binary.PutVarint(b[pos:], int64(p.Interval))
+	}
+	if p.IntervalOffset != 0 {
+		pos += binary.PutUvarint(b[pos:], pIntervalOffset)
+		pos += binary.PutVarint(b[pos:], int64(p.IntervalOffset))
 	}
 	if p.Length != 0 {
 		pos += binary.PutUvarint(b[pos:], pLength)
@@ -144,6 +150,8 @@ func (p *Params) readParam(b []byte) (pos int, err error) {
 			if p.Interval <= 0 {
 				err = Errorf(InvalidParamValue, "interval %d is <= 0", p.Interval)
 			}
+		case pIntervalOffset:
+			p.IntervalOffset = time.Duration(v)
 		case pLength:
 			p.Length = int(v)
 		case pReceivedStats:

@@ -270,6 +270,35 @@ func (c *Client) checkParameters() (err error) {
 	return
 }
 
+// WaitForIntervalOffset waits until the time's remainder is IntervalOffset when divided by Interval.
+func WaitForIntervalOffset(Interval time.Duration, IntervalOffset time.Duration, minWaitTime time.Duration) {
+	// Get the current time
+	currentTime := time.Now()
+
+	// Calculate the remainder of the current time when divided by the Interval
+	remainder := currentTime.UnixNano() % int64(Interval)
+
+	// Calculate the time to wait
+	var waitTime time.Duration
+	if remainder > int64(IntervalOffset) {
+		waitTime = Interval - time.Duration(remainder) + IntervalOffset
+	} else {
+		waitTime = IntervalOffset - time.Duration(remainder)
+	}
+
+	// Check if waitTime is smaller than minWaitTime and adjust
+	for waitTime < minWaitTime {
+		waitTime += Interval
+	}
+
+	// Wait for the calculated time
+	fmt.Printf("Waiting for %s, time is now: %d\n", waitTime, time.Now().UnixNano())
+	time.Sleep(waitTime)
+
+	// The time should now be a multiple of Interval + IntervalOffset
+	fmt.Println("Done waiting. The time is now:", time.Now().UnixNano())
+}
+
 // send sends all packets for the test to the server (called in goroutine from Run)
 func (c *Client) send(ctx context.Context) error {
 	defer func() {
@@ -278,6 +307,12 @@ func (c *Client) send(ctx context.Context) error {
 
 	if c.ThreadLock {
 		runtime.LockOSThread()
+	}
+
+	// if positive, need to start at a specific time
+	if c.IntervalOffset >= 0 {
+		// Wait until the offset arrives
+		WaitForIntervalOffset(c.Interval, c.IntervalOffset, MinWaitingTime)
 	}
 
 	MULTIPLY := c.Multiply

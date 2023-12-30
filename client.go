@@ -309,12 +309,6 @@ func (c *Client) send(ctx context.Context) error {
 		runtime.LockOSThread()
 	}
 
-	// if positive, need to start at a specific time
-	if c.IntervalOffset >= 0 {
-		// Wait until the offset arrives
-		WaitForIntervalOffset(c.Interval, c.IntervalOffset, MinWaitingTime)
-	}
-
 	MULTIPLY := c.Multiply
 	var p []*packet
 	var seqno []Seqno
@@ -358,14 +352,29 @@ func (c *Client) send(ctx context.Context) error {
 	// notify receive
 	c.initCh <- true
 
-	// record the start time of the test and calculate the end
+	// record the start time of the test
 	t := c.TimeSource.Now(BothClocks)
 	c.rec.Start = t
-	end := c.rec.Start.Add(c.Duration)
 
-	// keep sending until the duration has passed
+	// sleep until the start of next next frame
+	var err error
+	framenow := c.FrameSource.Now()
+	framenow, err = c.FrameTimer.Sleep(framenow, 2)
+	if err != nil {
+		return err
+	}
+
+	// store the start frame of the test and calculate endframe
+	framestart := framenow
+	frameend := framestart + c.DurationFrames
+
+	// keep sending until the duration frames has passed
 	for {
-		var err error
+
+		// wait for offset duration
+		if c.IntervalOffset > 0 {
+			time.Sleep(c.IntervalOffset)
+		}
 
 		for j := 0; j < MULTIPLY; j++ {
 
@@ -407,36 +416,22 @@ func (c *Client) send(ctx context.Context) error {
 			p[k].updateHMAC()
 		}
 
-		// set the current base interval we're at
-		tnext := c.rec.Start.Add(c.Interval *
-			(c.TimeSource.Now(Monotonic).Sub(c.rec.Start) / c.Interval))
+		// set the current base frame we're at
+		f := c.FrameSource.Now()
 
-		// if we're under half-way to the next interval, sleep until the next
-		// interval, but if we're over half-way, sleep until the interval after
-		// that
-		if p[MULTIPLY-1].tsent.Sub(c.rec.Start)%c.Interval < c.Interval/2 {
-			tnext = tnext.Add(c.Interval)
-		} else {
-			tnext = tnext.Add(2 * c.Interval)
-		}
-
-		// break if tnext is after the end of the test
-		if !tnext.Before(end) {
+		// break if framenow is after the end of the test
+		if f > frameend {
 			break
 		}
 
-		// calculate sleep duration
-		tsleep := c.TimeSource.Now(Monotonic)
-		dsleep := tnext.Sub(tsleep)
-
-		// sleep
-		t, err = c.Timer.Sleep(ctx, c.TimeSource, tsleep, dsleep)
+		// sleep for intervalframes
+		framenow, err = c.FrameTimer.Sleep(f, c.IntervalFrames)
 		if err != nil {
 			return err
 		}
 
 		// record timer error
-		c.rec.recordTimerErr(t.Sub(tsleep) - dsleep)
+		c.rec.recordTimerErr((framenow - f) - c.IntervalFrames)
 	}
 
 	return nil

@@ -1,7 +1,7 @@
 package nlmt
 
-// Version is the IRTT version number (replaced during build).
-var Version = "0.9.15"
+// Version is the IRTTF version number (replaced during build).
+var Version = "0.10"
 
 // ProtocolVersion is the protocol version number, which must match between client
 // and server.
@@ -12,7 +12,7 @@ var JSONFormatVersion = 1
 
 // VersionInfo stores the version information.
 type VersionInfo struct {
-	IRTT       string `json:"irtt"`
+	IRTTF      string `json:"irttf"`
 	Protocol   int    `json:"protocol"`
 	JSONFormat int    `json:"json_format"`
 }
@@ -20,7 +20,7 @@ type VersionInfo struct {
 // NewVersionInfo returns a new VersionInfo.
 func NewVersionInfo() *VersionInfo {
 	return &VersionInfo{
-		IRTT:       Version,
+		IRTTF:      Version,
 		Protocol:   ProtocolVersion,
 		JSONFormat: JSONFormatVersion,
 	}

@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/tmthrgd/go-shm v0.0.0-20230106080200-1ec4c2ba35cf // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
 )

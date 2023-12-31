@@ -18,7 +18,7 @@ const (
 // Client defaults.
 const (
 	DefaultDuration                = 1 * time.Minute
-	DefaultInterval                = 1 * time.Second
+	DefaultInterval                = 100 * time.Millisecond
 	DefaultIntervalOffset          = -1 * time.Second
 	MinWaitingTime                 = 5 * time.Millisecond
 	DefaultLength                  = 0
@@ -62,6 +62,11 @@ var DefaultTimer = NewCompTimer(DefaultCompTimerAverage)
 // DefaultTimeSource is the default TimeSource implementation (WindowsTimeSource
 // for Windows and GoTimeSource for everything else).
 var DefaultTimeSource = NewDefaultTimeSource()
+
+var DefaultFrameSourcePath = "/5gue_frame"
+var DefaultFrameDurationMS = float32(10.0)
+var DefaultIntervalFrames = 1
+var DefaultDurationFrames = 2000
 
 // output file for each connection
 var DefaultOutputJSON = false

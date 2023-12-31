@@ -25,13 +25,15 @@ func clientUsage() {
 	printf("Flags:")
 	printf("------")
 	printf("")
-	printf("-d duration    total time to send (default %s, see Duration units below)", DefaultDuration)
-	printf("-i interval    send interval (default %s, see Duration units below)", DefaultInterval)
-	printf("-f offset      forces a send interval offset (default random, see Duration units below)")
-	printf("-l length      length of packet (including irtt headers, default %d)", DefaultLength)
+	printf("-d duration          total time to send (default %s, see Duration units below)", DefaultDuration)
+	printf("-y frame duration    one frame length in ms (default %f ms)", DefaultFrameDurationMS)
+	printf("-i interval    		 send interval must be multiples of frame duration (default %s, see Duration units below)", DefaultInterval)
+	printf("-f offset      		 forces a send interval offset (default random, see Duration units below)")
+	printf("-l length      		 length of packet (including irtt headers, default %d)", DefaultLength)
 	printf("               increased as necessary for irtt headers, common values:")
 	printf("               1472 (max unfragmented size of IPv4 datagram for 1500 byte MTU)")
 	printf("               1452 (max unfragmented size of IPv6 datagram for 1500 byte MTU)")
+	printf("-p frame path  frame number shared memory path (default %s)", DefaultFrameSourcePath)
 	printf("-o file        write JSON output to file (use '-' for stdout, use 'd' for default filename)")
 	printf("               if file has no extension, .json.gz is added, output is gzipped")
 	printf("               if extension is .json.gz, output is gzipped")
@@ -163,6 +165,7 @@ func runClientCLI(args []string) {
 		usageAndExit(clientUsage, exitCodeBadCommandLine)
 	}
 	var durationStr = fs.StringP("d", "d", DefaultDuration.String(), "total time to send")
+	var frameDurationMS = fs.Float32P("y", "y", DefaultFrameDurationMS, "frame duration in ms")
 	var intervalStr = fs.StringP("i", "i", DefaultInterval.String(), "send interval")
 	var intervalOffsetStr = fs.StringP("f", "f", DefaultIntervalOffset.String(), "send interval offset")
 	var length = fs.IntP("l", "l", DefaultLength, "packet length")
@@ -172,6 +175,7 @@ func runClientCLI(args []string) {
 	var tmStr = fs.String("tripm", DefaultTripMode.String(), "trip mode")
 	var multiply = fs.IntP("m", "m", DefaultMultiply, "multiply packets")
 	var clockStr = fs.String("clock", DefaultClock.String(), "clock")
+	var frameSourcePath = fs.StringP("p", "p", DefaultFrameSourcePath, "frame number shared memory path")
 	var outputStr = fs.StringP("o", "o", "", "output file")
 	var outputDirStr = fs.String("outdir", DefaultOutputDir, "output directory")
 	var groupStr = fs.StringP("g", "g", "", "group name")
@@ -215,10 +219,24 @@ func runClientCLI(args []string) {
 			exitCodeBadCommandLine)
 	}
 
+	// obtain duration in frames
+	durationFrames := float64(duration.Milliseconds()) / float64(*frameDurationMS)
+	if durationFrames < 1 {
+		exitOnError(fmt.Errorf("duration %d ms smaller than one frame %f ms", duration.Milliseconds(), *frameDurationMS),
+			exitCodeBadCommandLine)
+	}
+
 	// parse interval
 	interval, err := time.ParseDuration(*intervalStr)
 	if err != nil {
 		exitOnError(fmt.Errorf("%s (use s for seconds)", err),
+			exitCodeBadCommandLine)
+	}
+
+	// obtain interval in frames
+	intervalFrames := float64(interval.Milliseconds()) / float64(*frameDurationMS)
+	if intervalFrames != float64(int64(intervalFrames)) {
+		exitOnError(fmt.Errorf("interval %d ms must be a multiple of frame duration %f ms", interval.Milliseconds(), *frameDurationMS),
 			exitCodeBadCommandLine)
 	}
 
@@ -330,8 +348,12 @@ func runClientCLI(args []string) {
 	cfg.RemoteAddress = raddrStr
 	cfg.OpenTimeouts = timeouts
 	cfg.NoTest = *noTest
+	cfg.FrameSourcePath = *frameSourcePath
+	cfg.FrameDurationMS = *frameDurationMS
 	cfg.Duration = duration
+	cfg.DurationFrames = int(durationFrames)
 	cfg.Interval = interval
+	cfg.IntervalFrames = int(intervalFrames)
 	cfg.Length = *length
 	cfg.ReceivedStats = rs
 	cfg.StampAt = at

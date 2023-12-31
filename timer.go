@@ -2,9 +2,12 @@ package nlmt
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -18,6 +21,69 @@ type Timer interface {
 	Sleep(ctx context.Context, tsrc TimeSource, now Time, d time.Duration) (Time, error)
 
 	String() string
+}
+
+type FrameSource struct {
+	sharedmemorypath string
+	shmfile          *os.File
+	shareddata       []byte
+}
+
+// NewFrameSource is the constructor for FrameSource.
+func NewFrameSource(sharedmemorypath string) (*FrameSource, error) {
+	// Open the shared memory file
+	shmfile, err := os.Open(sharedmemorypath)
+	if err != nil {
+		return nil, fmt.Errorf("error opening shared memory file: %v", err)
+	}
+	// Map the shared memory file to the address space of the process
+	shareddata, err := syscall.Mmap(int(shmfile.Fd()), 0, 4, syscall.PROT_READ, syscall.MAP_SHARED)
+	if err != nil {
+		shmfile.Close()
+		return nil, fmt.Errorf("error mapping shared memory to process: %v", err)
+	}
+	return &FrameSource{
+		sharedmemorypath: sharedmemorypath,
+		shmfile:          shmfile,
+		shareddata:       shareddata,
+	}, nil
+}
+
+// Close releases resources associated with the FrameSource.
+func (fs *FrameSource) Close() error {
+	err := syscall.Munmap(fs.shareddata)
+	if err != nil {
+		return fmt.Errorf("error unmapping shared memory: %v", err)
+	}
+
+	err = fs.shmfile.Close()
+	if err != nil {
+		return fmt.Errorf("error closing shared memory file: %v", err)
+	}
+
+	return nil
+}
+
+// Now returns the current frame
+func (fs *FrameSource) Now() int {
+	return int(binary.LittleEndian.Uint32(fs.shareddata))
+}
+
+// String returns a string representation of the FrameSource
+func (fs *FrameSource) String() string {
+	return "frame_source_at_" + fs.sharedmemorypath
+}
+
+// Sleep waits for the target frame
+func (fs *FrameSource) Sleep(targetframe int) (int, error) {
+	for {
+		currentframe := fs.Now()
+		if currentframe >= targetframe {
+			return currentframe, nil
+		}
+		// Sleep for a short duration before checking again
+		time.Sleep(100 * time.Microsecond)
+	}
 }
 
 // SimpleTimer uses Go's default time functions. It must be created using

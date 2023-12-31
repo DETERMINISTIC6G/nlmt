@@ -358,8 +358,12 @@ func (c *Client) send(ctx context.Context) error {
 
 	// sleep until the start of next next frame
 	var err error
-	framenow := c.FrameSource.Now()
-	framenow, err = c.FrameTimer.Sleep(framenow, 2)
+	framesource, err := NewFrameSource(c.FrameSourcePath)
+	if err != nil {
+		return err
+	}
+	framenow := framesource.Now()
+	framenow, err = framesource.Sleep(framenow + 2)
 	if err != nil {
 		return err
 	}
@@ -417,7 +421,7 @@ func (c *Client) send(ctx context.Context) error {
 		}
 
 		// set the current base frame we're at
-		f := c.FrameSource.Now()
+		f := framesource.Now()
 
 		// break if framenow is after the end of the test
 		if f > frameend {
@@ -425,15 +429,17 @@ func (c *Client) send(ctx context.Context) error {
 		}
 
 		// sleep for intervalframes
-		framenow, err = c.FrameTimer.Sleep(f, c.IntervalFrames)
+		framenow, err = framesource.Sleep(f + c.IntervalFrames)
 		if err != nil {
 			return err
 		}
 
 		// record timer error
-		c.rec.recordTimerErr((framenow - f) - c.IntervalFrames)
+		diffms := c.FrameDurationMS * float32((framenow-f)-c.IntervalFrames)
+		c.rec.recordTimerErr(time.Duration(diffms * 1000000))
 	}
 
+	framesource.Close()
 	return nil
 }
 

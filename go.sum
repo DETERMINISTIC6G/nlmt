@@ -2,6 +2,8 @@ github.com/ogier/pflag v0.0.2-0.20160129220114-45c278ab3607 h1:xZoOomu8/sOa+6Q46
 github.com/ogier/pflag v0.0.2-0.20160129220114-45c278ab3607/go.mod h1:zkFki7tvTa0tafRvTBIZTvzYyAu6kQhPZFnshFFPE+g=
 github.com/pkg/profile v1.3.0 h1:OQIvuDgm00gWVWGTf4m4mCt6W1/0YqU7Ntg0mySWgaI=
 github.com/pkg/profile v1.3.0/go.mod h1:hJw3o1OdXxsrSjjVksARp5W95eeEaEfptyVZyv6JUPA=
+github.com/tmthrgd/go-shm v0.0.0-20230106080200-1ec4c2ba35cf h1:zllFA+KeQ5EGsnMv8YtqBZQTEERX9UZkY+h2nKYY2JY=
+github.com/tmthrgd/go-shm v0.0.0-20230106080200-1ec4c2ba35cf/go.mod h1:sreX9Ec5xasLXkHjdpdrCXuYWgnB8a2T2ElLH+weMWY=
 golang.org/x/mod v0.11.0 h1:bUO06HqtnRcc/7l71XBe4WcqTZ+3AH1J59zWDDwLKgU=
 golang.org/x/mod v0.11.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
 golang.org/x/net v0.11.0 h1:Gi2tvZIJyBtO9SDr1q9h5hEQCp/4L2RQ+ar0qjx2oNU=

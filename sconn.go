@@ -592,15 +592,20 @@ func (sc *sconnHandler) OneWayOnReceived(seqno Seqno, owtd *OneWayTripData,
 				}
 			}
 			sd := ""
+			rt := ""
+			st := ""
 			if owtd.SendDelay() != InvalidDuration {
 				sd = fmt.Sprintf(" sd=%s", rdur(owtd.SendDelay()))
+				st = fmt.Sprintf(" st=%d", owtd.Client.Send.Wall)
+				rt = fmt.Sprintf(" st=%d", owtd.Server.Receive.Wall)
 			}
 			sl := ""
 			if late {
 				sl = " (LATE)"
 			}
-			printf("[%s] seq=%d %s ipdv=%s%s", sc.raddr, seqno,
-				sd, ipdv, sl)
+
+			printf("[%s] seq=%d %s%s%s ipdv=%s%s", sc.raddr, seqno,
+				sd, st, rt, ipdv, sl)
 		}
 	}
 }

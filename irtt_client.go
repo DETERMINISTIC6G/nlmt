@@ -592,19 +592,24 @@ func (c *clientHandler) OnReceived(seqno Seqno, rtd *RoundTripData,
 				}
 			}
 			rd := ""
+			rt := ""
 			if rtd.ReceiveDelay() != InvalidDuration {
 				rd = fmt.Sprintf(" rd=%s", rdur(rtd.ReceiveDelay()))
+				rt = fmt.Sprintf(" rt=%d", rtd.Client.Receive.Wall)
 			}
 			sd := ""
+			st := ""
 			if rtd.SendDelay() != InvalidDuration {
 				sd = fmt.Sprintf(" sd=%s", rdur(rtd.SendDelay()))
+				st = fmt.Sprintf(" st=%d", rtd.Client.Send.Wall)
 			}
 			sl := ""
 			if late {
 				sl = " (LATE)"
 			}
-			printf("seq=%d rtt=%s%s%s ipdv=%s%s", seqno, rdur(rtd.RTT()),
-				rd, sd, ipdv, sl)
+
+			printf("seq=%d rtt=%s%s%s%s%s ipdv=%s%s", seqno, rdur(rtd.RTT()),
+				rd, sd, rt, st, ipdv, sl)
 		}
 	}
 }

@@ -63,8 +63,10 @@ var DefaultTimer = NewCompTimer(DefaultCompTimerAverage)
 // for Windows and GoTimeSource for everything else).
 var DefaultTimeSource = NewDefaultTimeSource()
 
-var DefaultFrameSourcePath = "/5gue_frame"
-var DefaultFrameDurationMS = float32(10.0)
+// client's shared memory clock settings
+var DefaultFrameSourcePath = ""
+var DefaultFrameSource *FrameSource = nil
+var DefaultFrameDuration = 10 * time.Millisecond
 var DefaultIntervalFrames = 1
 var DefaultDurationFrames = 2000
 

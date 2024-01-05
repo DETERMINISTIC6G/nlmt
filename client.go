@@ -126,7 +126,11 @@ func (c *Client) Run(ctx context.Context) (r *Result, err error) {
 	go func() {
 		defer wg.Done()
 		defer c.close()
-		serr = c.send(ctx)
+		if c.FrameSource == nil {
+			serr = c.send(ctx)
+		} else {
+			serr = c.send_synced(ctx)
+		}
 		if serr == nil {
 			err = c.wait(ctx)
 		}
@@ -309,6 +313,149 @@ func (c *Client) send(ctx context.Context) error {
 		runtime.LockOSThread()
 	}
 
+	// if positive, need to start at a specific time
+	if c.IntervalOffset >= 0 {
+		// Wait until the offset arrives
+		WaitForIntervalOffset(c.Interval, c.IntervalOffset, MinWaitingTime)
+	}
+
+	MULTIPLY := c.Multiply
+	var p []*packet
+	var seqno []Seqno
+
+	for i := 0; i < MULTIPLY; i++ {
+		// include 0 timestamp in appropriate fields
+		seqno = append(seqno, Seqno(i))
+		p = append(p, c.conn.newPacket())
+
+		if c.conn.dscpSupport {
+			p[i].dscp = c.DSCP
+		}
+		p[i].addFields(fechoRequest, true)
+		p[i].zeroReceivedStats(c.ReceivedStats)
+		if c.TripMode == TMRound {
+			p[i].stampZeroes(c.StampAt, c.Clock)
+		} else {
+			mt := c.TimeSource.Now(c.Clock)
+			p[i].setTimestamp(AtSend, Timestamp{Time{}, mt})
+		}
+		p[i].setSeqno(seqno[i])
+
+		// set packet len
+		c.Length = p[i].setLen(c.Length)
+
+		// fill the first packet, if necessary
+		if c.Filler != nil {
+			err := p[i].readPayload(c.Filler)
+			if err != nil {
+				return err
+			}
+		} else {
+			p[i].zeroPayload()
+		}
+
+		// lastly, set the HMAC
+		p[i].updateHMAC()
+
+	}
+
+	// notify receive
+	c.initCh <- true
+
+	// record the start time of the test and calculate the end
+	t := c.TimeSource.Now(BothClocks)
+	c.rec.Start = t
+	end := c.rec.Start.Add(c.Duration)
+
+	// keep sending until the duration has passed
+	for {
+		var err error
+
+		for j := 0; j < MULTIPLY; j++ {
+
+			// send to network and record times right before and after
+			tsend := c.rec.recordPreSend()
+
+			if clientDropsPercent == 0 || rand.Float32() > clientDropsPercent {
+				if c.TripMode == TMOneWay {
+					mt := c.TimeSource.Now(c.Clock)
+					p[j].setTimestamp(AtSend, Timestamp{Time{}, mt})
+				}
+				err = c.conn.send(p[j])
+			} else {
+				// simulate drop with an average send time
+				time.Sleep(20 * time.Microsecond)
+			}
+
+			// return on error
+			if err != nil {
+				c.rec.removeLastStamps()
+				return err
+			}
+
+			// record send call
+			c.rec.recordPostSend(tsend, p[j].tsent, uint64(p[j].length()))
+		}
+
+		// prepare next packets (before sleep, so the next send time is as
+		// precise as possible)
+		for k := 0; k < MULTIPLY; k++ {
+			seqno[k] += Seqno(MULTIPLY)
+			p[k].setSeqno(seqno[k])
+			if c.Filler != nil && !c.FillOne {
+				err := p[k].readPayload(c.Filler)
+				if err != nil {
+					return err
+				}
+			}
+			p[k].updateHMAC()
+		}
+
+		// set the current base interval we're at
+		tnext := c.rec.Start.Add(c.Interval *
+			(c.TimeSource.Now(Monotonic).Sub(c.rec.Start) / c.Interval))
+
+		// if we're under half-way to the next interval, sleep until the next
+		// interval, but if we're over half-way, sleep until the interval after
+		// that
+		if p[MULTIPLY-1].tsent.Sub(c.rec.Start)%c.Interval < c.Interval/2 {
+			tnext = tnext.Add(c.Interval)
+		} else {
+			tnext = tnext.Add(2 * c.Interval)
+		}
+
+		// break if tnext is after the end of the test
+		if !tnext.Before(end) {
+			break
+		}
+
+		// calculate sleep duration
+		tsleep := c.TimeSource.Now(Monotonic)
+		dsleep := tnext.Sub(tsleep)
+
+		// sleep
+		t, err = c.Timer.Sleep(ctx, c.TimeSource, tsleep, dsleep)
+		if err != nil {
+			return err
+		}
+
+		// record timer error
+		c.rec.recordTimerErr(t.Sub(tsleep) - dsleep)
+	}
+
+	return nil
+}
+
+// send sends all packets for the test to the server (called in goroutine from Run)
+func (c *Client) send_synced(ctx context.Context) error {
+	defer func() {
+		close(c.initCh)
+	}()
+
+	if c.ThreadLock {
+		runtime.LockOSThread()
+	}
+
 	MULTIPLY := c.Multiply
 	var p []*packet
 	var seqno []Seqno
@@ -358,12 +505,8 @@ func (c *Client) send(ctx context.Context) error {
 
 	// sleep until the start of next next frame
 	var err error
-	framesource, err := NewFrameSource(c.FrameSourcePath)
-	if err != nil {
-		return err
-	}
-	framenow := framesource.Now()
-	framenow, err = framesource.Sleep(framenow + 2)
+	framenow := c.FrameSource.Now()
+	framenow, err = c.FrameSource.Sleep(ctx, framenow+2)
 	if err != nil {
 		return err
 	}
@@ -421,7 +564,7 @@ func (c *Client) send(ctx context.Context) error {
 		}
 
 		// set the current base frame we're at
-		f := framesource.Now()
+		f := c.FrameSource.Now()
 
 		// break if framenow is after the end of the test
 		if f > frameend {
@@ -429,17 +572,16 @@ func (c *Client) send(ctx context.Context) error {
 		}
 
 		// sleep for intervalframes
-		framenow, err = framesource.Sleep(f + c.IntervalFrames)
+		framenow, err = c.FrameSource.Sleep(ctx, f+c.IntervalFrames)
 		if err != nil {
 			return err
 		}
 
 		// record timer error
-		diffms := c.FrameDurationMS * float32((framenow-f)-c.IntervalFrames)
+		diffms := float32(c.FrameSource.frameduration.Milliseconds()) * float32((framenow-f)-c.IntervalFrames)
 		c.rec.recordTimerErr(time.Duration(diffms * 1000000))
 	}
 
-	framesource.Close()
 	return nil
 }
 

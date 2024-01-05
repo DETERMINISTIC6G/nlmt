@@ -27,10 +27,11 @@ type FrameSource struct {
 	sharedmemorypath string
 	shmfile          *os.File
 	shareddata       []byte
+	frameduration    time.Duration
 }
 
 // NewFrameSource is the constructor for FrameSource.
-func NewFrameSource(sharedmemorypath string) (*FrameSource, error) {
+func NewFrameSource(sharedmemorypath string, frameduration time.Duration) (*FrameSource, error) {
 	// Open the shared memory file
 	shmfile, err := os.Open(sharedmemorypath)
 	if err != nil {
@@ -46,6 +47,7 @@ func NewFrameSource(sharedmemorypath string) (*FrameSource, error) {
 		sharedmemorypath: sharedmemorypath,
 		shmfile:          shmfile,
 		shareddata:       shareddata,
+		frameduration:    frameduration,
 	}, nil
 }
 
@@ -71,18 +73,28 @@ func (fs *FrameSource) Now() int {
 
 // String returns a string representation of the FrameSource
 func (fs *FrameSource) String() string {
-	return "frame_source_at_" + fs.sharedmemorypath
+	if fs != nil {
+		return "frame_source_at_" + fs.sharedmemorypath + "_duration_" + fs.frameduration.String()
+	} else {
+		return "none"
+	}
 }
 
 // Sleep waits for the target frame
-func (fs *FrameSource) Sleep(targetframe int) (int, error) {
+func (fs *FrameSource) Sleep(ctx context.Context, targetframe int) (int, error) {
 	for {
-		currentframe := fs.Now()
-		if currentframe >= targetframe {
-			return currentframe, nil
+		select {
+		case <-ctx.Done():
+			currentframe := fs.Now()
+			return currentframe, ctx.Err()
+		default:
+			currentframe := fs.Now()
+			if currentframe >= targetframe {
+				return currentframe, nil
+			}
+			// Sleep for a short duration before checking again
+			time.Sleep(100 * time.Microsecond)
 		}
-		// Sleep for a short duration before checking again
-		time.Sleep(100 * time.Microsecond)
 	}
 }
 

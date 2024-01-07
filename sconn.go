@@ -86,7 +86,7 @@ func accept(l *listener, p *packet) (sc *sconn, err error) {
 	}
 
 	// add recorder handler
-	sc.rHandler = &sconnHandler{p.raddr, sc.listener.ServerConfig.Quiet, sc.listener.ServerConfig.ReallyQuiet}
+	sc.rHandler = &sconnHandler{p.raddr, sc.listener.ServerConfig.netprintp, sc.listener.ServerConfig.Quiet, sc.listener.ServerConfig.ReallyQuiet}
 
 	// create recorder if oneway
 	if params.TripMode == TMOneWay {
@@ -571,6 +571,7 @@ func writeOneWayResultJSON(r *OneWayResult, output string, cancelled bool) error
 
 type sconnHandler struct {
 	raddr       *net.UDPAddr
+	netprintp   *NetPrint
 	quiet       bool
 	reallyQuiet bool
 }
@@ -597,15 +598,26 @@ func (sc *sconnHandler) OneWayOnReceived(seqno Seqno, owtd *OneWayTripData,
 			if owtd.SendDelay() != InvalidDuration {
 				sd = fmt.Sprintf(" sd=%s", rdur(owtd.SendDelay()))
 				st = fmt.Sprintf(" st=%d", owtd.Client.Send.Wall)
-				rt = fmt.Sprintf(" st=%d", owtd.Server.Receive.Wall)
+				rt = fmt.Sprintf(" rt=%d", owtd.Server.Receive.Wall)
 			}
 			sl := ""
 			if late {
 				sl = " (LATE)"
 			}
 
-			printf("[%s] seq=%d %s%s%s ipdv=%s%s", sc.raddr, seqno,
-				sd, st, rt, ipdv, sl)
+			if sc.netprintp == nil {
+				printf("[%s] seq=%d %s%s%s ipdv=%s%s", sc.raddr, seqno,
+					sd, st, rt, ipdv, sl)
+			} else {
+				message := fmt.Sprintf("[%s] seq=%d %s%s%s ipdv=%s%s\n", sc.raddr, seqno,
+					sd, st, rt, ipdv, sl)
+				// Send the formatted string to the TCP socket
+				err := sc.netprintp.WriteToConnection(message)
+				if err != nil {
+					fmt.Println("Error net printing result:", err)
+					return
+				}
+			}
 		}
 	}
 }

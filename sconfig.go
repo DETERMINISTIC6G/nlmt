@@ -26,6 +26,7 @@ type ServerConfig struct {
 	OutputJSON     bool
 	OutputJSONAddr string
 	OutputDir      string
+	netprintp      *NetPrint
 }
 
 // NewServerConfig returns a new ServerConfig with the default settings.
@@ -51,5 +52,6 @@ func NewServerConfig() *ServerConfig {
 		OutputJSON:     DefaultOutputJSON,
 		OutputJSONAddr: DefaultOutputJSONAddr,
 		OutputDir:      DefaultOutputDir,
+		netprintp:      nil,
 	}
 }

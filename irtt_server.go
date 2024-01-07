@@ -1,6 +1,7 @@
 package nlmt
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -37,6 +38,7 @@ func serverUsage() {
 	printf("               (default %s, see Duration units below)", DefaultMinInterval)
 	printf("-l length      max packet length (default %d), or 0 for no maximum", DefaultMaxLength)
 	printf("               numbers too small will cause test packets to be dropped")
+	printf("-n net print   print logs to a server e.g. \"0.0.0.0:50009\" (default disabled)")
 	printf("--hmac=key     add HMAC with key (0x for hex) to all packets, provides:")
 	printf("               dropping of all packets without a correct HMAC")
 	printf("               protection for server against unauthorized discovery and use")
@@ -95,6 +97,7 @@ func runServerCLI(args []string) {
 	var maxDuration = fs.DurationP("d", "d", DefaultMaxDuration, "max duration")
 	var minInterval = fs.DurationP("i", "i", DefaultMinInterval, "min interval")
 	var maxLength = fs.IntP("l", "l", DefaultMaxLength, "max length")
+	var netprintAddr = fs.StringP("n", "n", "", "netprint address")
 	var allowTimestampStr = fs.String("tstamp", DefaultAllowStamp.String(), "allow timestamp")
 	var hmacStr = fs.String("hmac", defaultHMACKey, "HMAC key")
 	var syslogStr *string
@@ -186,6 +189,17 @@ func runServerCLI(args []string) {
 	} else {
 		cfg.OutputJSON = true
 		cfg.OutputJSONAddr = *outputStr
+	}
+
+	// connect to the print server if set
+	if *netprintAddr != "" {
+		// Create a TCP connection to the server
+		cfg.netprintp, err = NewNetPrint(*netprintAddr)
+		if err != nil {
+			fmt.Println("Error connecting to the netprint server: ", err)
+			exitOnError(err, exitCodeBadCommandLine)
+		}
+		defer cfg.netprintp.CloseConnection()
 	}
 
 	// create server

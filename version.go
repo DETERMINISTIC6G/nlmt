@@ -1,7 +1,7 @@
 package nlmt
 
 // Version is the NLMT version number (replaced during build).
-var Version = "0.10.3"
+var Version = "0.10.4"
 
 // ProtocolVersion is the protocol version number, which must match between client
 // and server.

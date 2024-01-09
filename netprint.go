@@ -3,6 +3,7 @@ package nlmt
 import (
 	"net"
 	"sync"
+	"time"
 )
 
 // NetPrint represents a connection manager
@@ -17,6 +18,27 @@ func NewNetPrint(destAddr string) (*NetPrint, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	np := &NetPrint{conn: conn}
+
+	// Start a goroutine to send packets every second
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+
+		for range ticker.C {
+			// Lock the mutex before writing to the connection
+			np.mu.Lock()
+			_, err := np.conn.Write([]byte("test\n"))
+			np.mu.Unlock()
+
+			if err != nil {
+				// Handle error (e.g., log it)
+				np.CloseConnection()
+				panic(err)
+			}
+		}
+	}()
 
 	return &NetPrint{conn: conn}, nil
 }
